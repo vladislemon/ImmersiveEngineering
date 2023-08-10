@@ -173,7 +173,7 @@ public class NEICokeOvenHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleTooltip(GuiRecipe gui, List<String> list, int recipe)
+	public List<String> handleTooltip(GuiRecipe<?> gui, List<String> list, int recipe)
 	{
 		CachedCokeOvenRecipe r = (CachedCokeOvenRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)

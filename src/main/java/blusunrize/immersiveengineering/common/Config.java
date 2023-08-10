@@ -31,7 +31,14 @@ public class Config
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 
-		double currentVersion = ImmersiveEngineering.VERSION_D;
+		double currentVersion = .71;
+		try {
+			int firstDotIndex = ImmersiveEngineering.VERSION.indexOf('.');
+			String firstPart = ImmersiveEngineering.VERSION.substring(0, firstDotIndex + 1);
+			String secondPart = ImmersiveEngineering.VERSION.substring(firstDotIndex + 1).replaceAll("\\D", "");
+			currentVersion = Double.parseDouble(firstPart + secondPart);
+		} catch (Exception ignored) {
+		}
 		Property propLastVersion = config.get("general","LastVersion",.54, "The last version of IE that was run in this instance. DO NOT CHANGE THIS, IT WILL BREAK THINGS.");
 		//		Property propReGen = config.get("general", "RegenTransferValues", true);
 		double lastVersion = propLastVersion.getDouble();

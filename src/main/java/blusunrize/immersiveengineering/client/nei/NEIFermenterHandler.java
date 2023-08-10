@@ -181,7 +181,7 @@ public class NEIFermenterHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleTooltip(GuiRecipe gui, List<String> list, int recipe)
+	public List<String> handleTooltip(GuiRecipe<?> gui, List<String> list, int recipe)
 	{
 		CachedFermenterRecipe r = (CachedFermenterRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)

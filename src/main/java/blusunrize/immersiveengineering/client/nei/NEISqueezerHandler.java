@@ -181,7 +181,7 @@ public class NEISqueezerHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleTooltip(GuiRecipe gui, List<String> list, int recipe)
+	public List<String> handleTooltip(GuiRecipe<?> gui, List<String> list, int recipe)
 	{
 		CachedSqueezerRecipe r = (CachedSqueezerRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)

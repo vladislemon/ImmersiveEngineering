@@ -1,10 +1,10 @@
 [
 {
-  "modid": "ImmersiveEngineering",
-  "name": "Immersive Engineering",
+  "modid": "${modId}",
+  "name": "${modName}",
   "description": "",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "${modVersion}",
+  "mcversion": "${minecraftVersion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["BluSunrize","Damien A.W. Hazard"],

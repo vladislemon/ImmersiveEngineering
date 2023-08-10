@@ -173,7 +173,7 @@ public class NEIRefineryHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleTooltip(GuiRecipe gui, List<String> list, int recipe)
+	public List<String> handleTooltip(GuiRecipe<?> gui, List<String> list, int recipe)
 	{
 		CachedRefineryRecipe r = (CachedRefineryRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)

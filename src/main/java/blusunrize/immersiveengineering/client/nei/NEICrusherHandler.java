@@ -163,7 +163,7 @@ public class NEICrusherHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleItemTooltip(GuiRecipe gui, ItemStack stack, List<String> currenttip, int recipe)
+	public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe)
 	{
 		Point mouse = getMousePosition();
 		Point offset = gui.getRecipePosition(recipe);

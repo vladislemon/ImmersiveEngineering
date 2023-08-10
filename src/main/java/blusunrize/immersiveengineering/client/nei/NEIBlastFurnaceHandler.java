@@ -128,7 +128,7 @@ public class NEIBlastFurnaceHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleItemTooltip(GuiRecipe gui, ItemStack stack, List<String> currenttip, int recipe)
+	public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe)
 	{
 		if(recipe%2==0 && BlastFurnaceRecipe.isValidBlastFuel(stack))
 			currenttip.add(EnumChatFormatting.GRAY+StatCollector.translateToLocalFormatted("desc.ImmersiveEngineering.info.blastFuelTime", BlastFurnaceRecipe.getBlastFuelTime(stack)));
