@@ -72,12 +72,11 @@ public class TileEntitySampleDrill extends TileEntityIEBase implements IEnergyRe
 	public float getVeinIntegrity()
 	{
 		MineralWorldInfo info = ExcavatorHandler.getMineralWorldInfo(worldObj, (xCoord>>4), (zCoord>>4));
-		if(ExcavatorHandler.mineralVeinCapacity<0||info.depletion<0)
-			return -1;
-		else if(info.mineralOverride==null && info.mineral==null)
-			return 0;
-		else
-			return (Config.getInt("excavator_depletion")-info.depletion)/(float)Config.getInt("excavator_depletion");
+		if (info != null) {
+			ExcavatorHandler.acknowledgeDepletion(worldObj, (xCoord>>4), (zCoord>>4));
+			return info.getIntegrity();
+		}
+		return 0;
 	}
 
 	@Override

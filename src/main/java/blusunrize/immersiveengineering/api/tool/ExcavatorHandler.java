@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
+import blusunrize.immersiveengineering.common.Config;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagFloat;
@@ -137,6 +138,13 @@ public class ExcavatorHandler
 	{
 		MineralWorldInfo info = getMineralWorldInfo(world,chunkX,chunkZ);
 		info.depletion++;
+		IESaveData.setDirty(world.provider.dimensionId);
+	}
+
+	public static void acknowledgeDepletion(World world, int chunkX, int chunkZ)
+	{
+		MineralWorldInfo info = getMineralWorldInfo(world,chunkX,chunkZ);
+		info.lastKnownDepletion = info.depletion;
 		IESaveData.setDirty(world.provider.dimensionId);
 	}
 
@@ -304,6 +312,30 @@ public class ExcavatorHandler
 		public MineralMix mineral;
 		public MineralMix mineralOverride;
 		public int depletion;
+		public int lastKnownDepletion;
+
+		public MineralMix getMineral() {
+			return mineralOverride != null ? mineralOverride : mineral;
+		}
+
+		private float getIntegrity(int depletion) {
+			if (ExcavatorHandler.mineralVeinCapacity < 0 || depletion < 0) {
+				return Float.POSITIVE_INFINITY;
+			} else if (getMineral() == null) {
+				return 0;
+			} else {
+				int maxDepletion = Config.getInt("excavator_depletion");
+				return Math.max((maxDepletion - depletion) / (float) maxDepletion, 0);
+			}
+		}
+
+		public float getIntegrity() {
+			return getIntegrity(depletion);
+		}
+
+		public float getLastKnownIntegrity() {
+			return getIntegrity(lastKnownDepletion);
+		}
 
 		public NBTTagCompound writeToNBT()
 		{
@@ -313,6 +345,7 @@ public class ExcavatorHandler
 			if(mineralOverride!=null)
 				tag.setString("mineralOverride", mineralOverride.name);
 			tag.setInteger("depletion", depletion);
+			tag.setInteger("lastKnownDepletion", lastKnownDepletion);
 			return tag;
 		}
 		public static MineralWorldInfo readFromNBT(NBTTagCompound tag)
@@ -333,6 +366,7 @@ public class ExcavatorHandler
 						info.mineralOverride = mineral;
 			}
 			info.depletion = tag.getInteger("depletion");
+			info.lastKnownDepletion = tag.getInteger("lastKnownDepletion");
 			return info;
 		}
 	}

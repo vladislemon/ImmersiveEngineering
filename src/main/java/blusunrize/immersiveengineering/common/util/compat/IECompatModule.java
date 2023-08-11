@@ -40,7 +40,6 @@ public abstract class IECompatModule
 		moduleClasses.put("chisel", ChiselHelper.class);
 		moduleClasses.put("harvestcraft", HarvestCraftHelper.class);
 		moduleClasses.put("CarpentersBlocks", CarpentersHelper.class);
-		moduleClasses.put("Forestry", ForestryHelper.class);
 		moduleClasses.put("Botania", BotaniaHelper.class);
 		moduleClasses.put("etfuturum", EtFuturumHelper.class);
 		moduleClasses.put("EnderIO", EnderIOHelper.class);
@@ -54,6 +53,7 @@ public abstract class IECompatModule
 		moduleClasses.put("Avaritia", AvaritiaHelper.class);
 		moduleClasses.put("ComputerCraft", ComputercraftHelper.class);
 		moduleClasses.put("OpenComputers", OCHelper.class);
+		moduleClasses.put("MapWriter", MapWriterHelper.class);
 	}
 
 	public static void doModulesPreInit()

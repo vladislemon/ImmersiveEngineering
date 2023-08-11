@@ -422,7 +422,7 @@ public class BlockMetalDevices extends BlockIEBase implements blusunrize.aquatwe
 					else
 					{
 						float veinIntegrity = drill.getVeinIntegrity();
-						if(veinIntegrity<0)
+						if(Float.isInfinite(veinIntegrity))
 							mineralName = StatCollector.translateToLocal(Lib.CHAT_INFO+"coreDrill.infinite")+" "+mineralName;
 						player.addChatMessage(new ChatComponentTranslation(Lib.CHAT_INFO+"coreDrill.result.mineral",mineralName));
 						if(veinIntegrity>0)
