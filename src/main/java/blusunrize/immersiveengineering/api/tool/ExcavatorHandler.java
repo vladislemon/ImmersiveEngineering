@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 
 import blusunrize.immersiveengineering.common.Config;
+import blusunrize.immersiveengineering.common.util.network.MessageMineralCacheSync;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagFloat;
@@ -131,6 +132,7 @@ public class ExcavatorHandler
 			worldInfo = new MineralWorldInfo();
 			worldInfo.mineral = mix;
 			mineralCache.put(coords, worldInfo);
+			ImmersiveEngineering.packetHandler.sendToAll(new MessageMineralCacheSync(coords, worldInfo));
 		}
 		return worldInfo;
 	}

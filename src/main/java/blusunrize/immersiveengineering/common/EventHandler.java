@@ -41,6 +41,7 @@ import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.compat.computercraft.TileEntityRequest;
 import blusunrize.immersiveengineering.common.util.network.MessageDrill;
 import blusunrize.immersiveengineering.common.util.network.MessageMinecartShaderSync;
+import blusunrize.immersiveengineering.common.util.network.MessageMineralCacheSync;
 import blusunrize.immersiveengineering.common.util.network.MessageMineralListSync;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
@@ -312,6 +313,7 @@ public class EventHandler
 				if(e.getKey()!=null && e.getValue()!=null)
 					packetMap.put(e.getKey(), e.getValue());
 			ImmersiveEngineering.packetHandler.sendToAll(new MessageMineralListSync(packetMap));
+			ImmersiveEngineering.packetHandler.sendToAll(new MessageMineralCacheSync(ExcavatorHandler.mineralCache));
 		}
 	}
 

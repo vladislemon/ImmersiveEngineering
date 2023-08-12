@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 
+import blusunrize.immersiveengineering.common.util.network.MessageMineralCacheSync;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonStreamParser;
@@ -119,6 +120,7 @@ public class ImmersiveEngineering
 		packetHandler.registerMessage(MessageMinecartShaderSync.HandlerClient.class, MessageMinecartShaderSync.class, messageId++, Side.CLIENT);
 		packetHandler.registerMessage(MessageRequestBlockUpdate.Handler.class, MessageRequestBlockUpdate.class, messageId++, Side.SERVER);
 		packetHandler.registerMessage(MessageDrill.Handler.class, MessageDrill.class, messageId++, Side.CLIENT);
+		packetHandler.registerMessage(MessageMineralCacheSync.HandlerClient.class, MessageMineralCacheSync.class, messageId++, Side.CLIENT);
 	}
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event)
@@ -160,6 +162,7 @@ public class ImmersiveEngineering
 					IELogger.info("WorldData not found");
 					worldData = new IESaveData(IESaveData.dataName);
 					world.setItemData(IESaveData.dataName, worldData);
+					ExcavatorHandler.mineralCache.clear();
 				}
 				else
 					IELogger.info("WorldData retrieved");
