@@ -11,10 +11,13 @@ import blusunrize.immersiveengineering.client.models.ModelShaderMinecart;
 import blusunrize.immersiveengineering.common.Config;
 import blusunrize.immersiveengineering.common.IEContent;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mods.railcraft.api.crafting.IRockCrusherCraftingManager;
+import mods.railcraft.api.crafting.RailcraftCraftingManager;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelMinecart;
 import net.minecraft.client.model.ModelRenderer;
@@ -26,6 +29,8 @@ import net.minecraft.tileentity.TileEntity;
 
 public class RailcraftHelper extends IECompatModule
 {
+	public static final String RAILCRAFT_MODID = "Railcraft";
+
 	@Override
 	public void preInit()
 	{
@@ -34,14 +39,14 @@ public class RailcraftHelper extends IECompatModule
 	@Override
 	public void init()
 	{
-		Item itemRail = GameRegistry.findItem("Railcraft", "part.rail");
+		Item itemRail = GameRegistry.findItem(RAILCRAFT_MODID, "part.rail");
 		RailgunHandler.registerProjectileProperties(new ItemStack(itemRail,1,0), 7,1.25).setColourMap(new int[][]{{0xa4a4a4,0x686868}});
 		RailgunHandler.registerProjectileProperties(new ItemStack(itemRail,1,1), 6,1.375).setColourMap(new int[][]{{0xa4a4a4,0xa4a4a4,0x686868, 0xddb82c,0xc9901f}, {0xa4a4a4,0xa4a4a4,0x686868, 0xf5cc2d,0xddb82c},{0xa4a4a4,0xa4a4a4,0x686868, 0xf5cc2d,0xddb82c}, {0xa4a4a4,0xa4a4a4,0x686868, 0xddb82c,0xc9901f}});
 		RailgunHandler.registerProjectileProperties(new ItemStack(itemRail,1,3), 7,1).setColourMap(new int[][]{{0x999999,0xa4a4a4,0xa4a4a4, 0xc9901f,0xc9901f,0xba851d}});
 		RailgunHandler.registerProjectileProperties(new ItemStack(itemRail,1,4), 8,1.375).setColourMap(new int[][]{{0x686868,0x808080,0x808080, 0x3e2e60,0x3e2e60,0x31254d}});
 		RailgunHandler.registerProjectileProperties(new ItemStack(itemRail,1,5), 7,1).setColourMap(new int[][]{{0x999999,0xa4a4a4,0xa4a4a4, 0x9a6033,0x9a6033,0xa86938}});
 
-		Item itemRebar = GameRegistry.findItem("Railcraft", "part.rebar");
+		Item itemRebar = GameRegistry.findItem(RAILCRAFT_MODID, "part.rebar");
 		int[][] rebarColourMap = new int[8*3+1][];
 		rebarColourMap[0] = new int[]{0x4a2700, 0x592f00,0x592f00,0x592f00, 0x4a2700};
 		rebarColourMap[1] = new int[]{0x572e00, 0x673700,0x673700,0x673700, 0x572e00};
@@ -53,7 +58,7 @@ public class RailcraftHelper extends IECompatModule
 		RailgunHandler.registerProjectileProperties(new ItemStack(itemRebar), 7,1.25).setColourMap(rebarColourMap);
 		Config.setBoolean("literalRailGun", true);
 
-		FMLInterModComms.sendMessage("Railcraft", "boiler-fuel-liquid", IEContent.fluidBiodiesel.getName()+"@16000");
+		FMLInterModComms.sendMessage(RAILCRAFT_MODID, "boiler-fuel-liquid", IEContent.fluidBiodiesel.getName()+"@16000");
 	}
 
 	@Override
@@ -109,6 +114,13 @@ public class RailcraftHelper extends IECompatModule
 			return (!(boolean)c_isDoubleSlab.invoke(tile) && c_getBottomSlab.invoke(tile).toString()=="STEEL");
 		}catch(Exception e){}
 		return false;
+	}
+
+	public static IRockCrusherCraftingManager getRockCrusherCraftingManager() {
+		if (Loader.isModLoaded(RAILCRAFT_MODID)) {
+			return RailcraftCraftingManager.rockCrusher;
+		}
+		return null;
 	}
 
 	@SideOnly(Side.CLIENT)

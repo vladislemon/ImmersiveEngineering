@@ -17,12 +17,12 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.MultiblockCrush
 import blusunrize.immersiveengineering.common.util.IEDamageSources;
 import blusunrize.immersiveengineering.common.util.IESound;
 import blusunrize.immersiveengineering.common.util.Utils;
+import blusunrize.immersiveengineering.common.util.compat.RailcraftHelper;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyReceiver;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.railcraft.api.crafting.IRockCrusherRecipe;
-import mods.railcraft.api.crafting.RailcraftCraftingManager;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -269,9 +269,9 @@ public class TileEntityCrusher extends TileEntityMultiblockPart implements IEner
 			return r==CRUSHER_NULL?null:r;
 		}
 		CrusherRecipe ret = CrusherRecipe.findRecipe(in);
-		if (ret==null&&RailcraftCraftingManager.rockCrusher!=null)
+		if (ret==null&& RailcraftHelper.getRockCrusherCraftingManager() != null)
 		{
-			IRockCrusherRecipe crush = RailcraftCraftingManager.rockCrusher.getRecipe(in);
+			IRockCrusherRecipe crush = RailcraftHelper.getRockCrusherCraftingManager().getRecipe(in);
 			if (crush!=null)
 			{
 				List<Entry<ItemStack, Float>> out = crush.getOutputs();
