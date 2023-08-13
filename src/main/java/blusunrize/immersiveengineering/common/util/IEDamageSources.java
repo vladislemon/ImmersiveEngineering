@@ -1,7 +1,5 @@
 package blusunrize.immersiveengineering.common.util;
 
-import com.emoniph.witchery.util.EntityDamageSourceIndirectSilver;
-
 import blusunrize.immersiveengineering.common.entities.EntityRailgunShot;
 import blusunrize.immersiveengineering.common.entities.EntityRevolvershot;
 import net.minecraft.entity.Entity;
@@ -60,7 +58,7 @@ public class IEDamageSources
 	}
 	public static DamageSource causeSilverDamage(EntityRevolvershot shot, Entity shooter)
 	{
-		EntityDamageSourceIndirectSilver silver = new EntityDamageSourceIndirectSilver(shot, shooter);
+		EntityDamageSourceIndirect silver = new EntityDamageSourceIndirect("indirectMagic", shot, shooter);
 		silver.setProjectile();
 		silver.damageType = Lib.DMG_RevolverSilver;
 		return silver;

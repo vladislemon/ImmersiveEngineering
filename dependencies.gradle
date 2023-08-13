@@ -18,7 +18,6 @@ dependencies {
     implementation("curse.maven:ee3-65509:2305023")
     implementation("curse.maven:mapwriter-2-231387:2258787")
     implementation("curse.maven:minefactory-reloaded-66672:2366150")
-    implementation("curse.maven:witchery-69673:2234410")
     implementation("net.industrial-craft:industrialcraft-2:2.2.828-experimental:dev")
     implementation("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
 }
