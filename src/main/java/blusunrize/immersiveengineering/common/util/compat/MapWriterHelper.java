@@ -4,9 +4,9 @@ import blusunrize.immersiveengineering.common.util.compat.mapwriter.IEMineralsMw
 import mapwriter.api.MwAPI;
 
 public class MapWriterHelper extends IECompatModule {
+
     @Override
-    public void preInit() {
-    }
+    public void preInit() {}
 
     @Override
     public void init() {
@@ -14,6 +14,5 @@ public class MapWriterHelper extends IECompatModule {
     }
 
     @Override
-    public void postInit() {
-    }
+    public void postInit() {}
 }

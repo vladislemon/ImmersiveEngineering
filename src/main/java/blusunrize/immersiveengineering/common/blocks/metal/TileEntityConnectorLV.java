@@ -6,6 +6,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.ForgeDirection;
+
 import blusunrize.immersiveengineering.api.energy.IImmersiveConnectable;
 import blusunrize.immersiveengineering.api.energy.ImmersiveNetHandler;
 import blusunrize.immersiveengineering.api.energy.ImmersiveNetHandler.AbstractConnection;
@@ -23,319 +30,306 @@ import cofh.api.energy.IEnergyReceiver;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
 
 @Optional.Interface(iface = "ic2.api.energy.tile.IEnergySink", modid = "IC2")
-public class TileEntityConnectorLV extends TileEntityImmersiveConnectable implements IEnergyHandler, ic2.api.energy.tile.IEnergySink
-{
-	boolean inICNet=false;
-	public int facing=0;
-	private long lastTransfer = -1;
-	public int currentTickAccepted=0;
-	public static int[] connectorInputValues = {};
-	public int energyStored=0;
+public class TileEntityConnectorLV extends TileEntityImmersiveConnectable
+    implements IEnergyHandler, ic2.api.energy.tile.IEnergySink {
 
-	@Override
-	public void updateEntity()
-	{
-		if (!worldObj.isRemote) {
-			if (Lib.IC2 && !this.inICNet) {
-				IC2Helper.loadIC2Tile(this);
-				this.inICNet = true;
-			}
-			if (energyStored > 0) {
-				int temp = this.transferEnergy(energyStored, true, 0);
-				if (temp > 0)
-				{
-					energyStored -= this.transferEnergy(temp, false, 0);
-					markDirty();
-				}
-			}
-			currentTickAccepted = 0;
-		}
-	}
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
-		unload();
-	}
-	void unload()
-	{
-		if(Lib.IC2 && this.inICNet)
-		{
-			IC2Helper.unloadIC2Tile(this);
-			this.inICNet = false;
-		}
-	}
-	@Override
-	public void onChunkUnload()
-	{
-		super.onChunkUnload();
-		unload();
-	}
+    boolean inICNet = false;
+    public int facing = 0;
+    private long lastTransfer = -1;
+    public int currentTickAccepted = 0;
+    public static int[] connectorInputValues = {};
+    public int energyStored = 0;
 
-	@Override
-	public boolean canUpdate()
-	{
-		return true;
-	}
+    @Override
+    public void updateEntity() {
+        if (!worldObj.isRemote) {
+            if (Lib.IC2 && !this.inICNet) {
+                IC2Helper.loadIC2Tile(this);
+                this.inICNet = true;
+            }
+            if (energyStored > 0) {
+                int temp = this.transferEnergy(energyStored, true, 0);
+                if (temp > 0) {
+                    energyStored -= this.transferEnergy(temp, false, 0);
+                    markDirty();
+                }
+            }
+            currentTickAccepted = 0;
+        }
+    }
 
-	@Override
-	protected boolean canTakeLV()
-	{
-		return true;
-	}
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        unload();
+    }
 
-	@Override
-	public boolean isEnergyOutput()
-	{
-		ForgeDirection fd = ForgeDirection.getOrientation(facing);
-		TileEntity tile = worldObj.getTileEntity(xCoord+fd.offsetX, yCoord+fd.offsetY, zCoord+fd.offsetZ);
-		return tile !=null && (tile instanceof IEnergyReceiver || (Lib.IC2 && IC2Helper.isEnergySink(tile)) || (Lib.GREG && GregTechHelper.gregtech_isValidEnergyOutput(tile)));
-	}
-	@Override
-	public int outputEnergy(int amount, boolean simulate, int energyType)
-	{
-		int acceptanceLeft = getMaxOutput()-currentTickAccepted;
-		if(acceptanceLeft<=0)
-			return 0;
-		int toAccept = Math.min(acceptanceLeft, amount);
+    void unload() {
+        if (Lib.IC2 && this.inICNet) {
+            IC2Helper.unloadIC2Tile(this);
+            this.inICNet = false;
+        }
+    }
 
-		ForgeDirection fd = ForgeDirection.getOrientation(facing);
-		TileEntity capacitor = worldObj.getTileEntity(xCoord+fd.offsetX, yCoord+fd.offsetY, zCoord+fd.offsetZ);
-		int ret = 0;
-		if(capacitor instanceof IEnergyReceiver && ((IEnergyReceiver)capacitor).canConnectEnergy(fd.getOpposite()))
-			ret = ((IEnergyReceiver)capacitor).receiveEnergy(fd.getOpposite(), toAccept, simulate);
-		else if(Lib.IC2 && IC2Helper.isAcceptingEnergySink(capacitor, this, fd.getOpposite()))
-		{
-			double left = IC2Helper.injectEnergy(capacitor, fd.getOpposite(), ModCompatability.convertRFtoEU(toAccept, getIC2Tier()), canTakeHV()?(256*256): canTakeMV()?(128*128) : (32*32), simulate);
-			ret = toAccept-ModCompatability.convertEUtoRF(left);
-		}
-		else if(Lib.GREG && GregTechHelper.gregtech_isValidEnergyOutput(capacitor))
-		{
-			long translAmount = (long)ModCompatability.convertRFtoEU(toAccept, getIC2Tier());
-			long accepted = GregTechHelper.gregtech_outputGTPower(capacitor, (byte)fd.getOpposite().ordinal(), translAmount, 1L, simulate);
-			int reConv =  ModCompatability.convertEUtoRF(accepted);
-			ret = reConv;
-		}
-		if(!simulate)
-			currentTickAccepted+=ret;
-		return ret;
-	}
+    @Override
+    public void onChunkUnload() {
+        super.onChunkUnload();
+        unload();
+    }
 
-	@Override
-	public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
-	{
-		super.writeCustomNBT(nbt, descPacket);
-		nbt.setInteger("facing", facing);
-		nbt.setLong("lastTransfer", lastTransfer);
-		nbt.setInteger("stored", energyStored);
-	}
-	@Override
-	public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
-	{
-		super.readCustomNBT(nbt, descPacket);
-		facing = nbt.getInteger("facing");
-		lastTransfer = nbt.getLong("lastTransfer");
-		energyStored = nbt.getInteger("stored");
-	}
+    @Override
+    public boolean canUpdate() {
+        return true;
+    }
 
-	@Override
-	public Vec3 getRaytraceOffset(IImmersiveConnectable link)
-	{
-		ForgeDirection fd = ForgeDirection.getOrientation(facing).getOpposite();
-		return Vec3.createVectorHelper(.5+fd.offsetX*.0625, .5+fd.offsetY*.0625, .5+fd.offsetZ*.0625);
-	}
-	@Override
-	public Vec3 getConnectionOffset(Connection con)
-	{
-		ForgeDirection fd = ForgeDirection.getOrientation(facing).getOpposite();
-		double conRadius = con.cableType.getRenderDiameter()/2;
-		return Vec3.createVectorHelper(.5-conRadius*fd.offsetX, .5-conRadius*fd.offsetY, .5-conRadius*fd.offsetZ);
-	}
+    @Override
+    protected boolean canTakeLV() {
+        return true;
+    }
 
-	@SideOnly(Side.CLIENT)
-	private AxisAlignedBB renderAABB;
-	@SideOnly(Side.CLIENT)
-	@Override
-	public AxisAlignedBB getRenderBoundingBox()
-	{
-		if(renderAABB==null)
-		{
-			if(Config.getBoolean("increasedRenderboxes"))
-			{
-				int inc = getRenderRadiusIncrease();
-				renderAABB = AxisAlignedBB.getBoundingBox(xCoord-inc,yCoord-inc,zCoord-inc, xCoord+inc+1,yCoord+inc+1,zCoord+inc+1);
-			}
-			else
-				renderAABB = super.getRenderBoundingBox();
-		}
-		return renderAABB;
-	}
-	int getRenderRadiusIncrease()
-	{
-		return WireType.COPPER.getMaxLength();
-	}
+    @Override
+    public boolean isEnergyOutput() {
+        ForgeDirection fd = ForgeDirection.getOrientation(facing);
+        TileEntity tile = worldObj.getTileEntity(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ);
+        return tile != null && (tile instanceof IEnergyReceiver || (Lib.IC2 && IC2Helper.isEnergySink(tile))
+            || (Lib.GREG && GregTechHelper.gregtech_isValidEnergyOutput(tile)));
+    }
 
-	@Override
-	public boolean canConnectEnergy(ForgeDirection from)
-	{
-		return from.ordinal()==facing;
-	}
-	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive,boolean simulate)
-	{
-		if(worldObj.isRemote)
-			return 0;
-		if(worldObj.getTotalWorldTime()==lastTransfer)
-			return 0;
+    @Override
+    public int outputEnergy(int amount, boolean simulate, int energyType) {
+        int acceptanceLeft = getMaxOutput() - currentTickAccepted;
+        if (acceptanceLeft <= 0) return 0;
+        int toAccept = Math.min(acceptanceLeft, amount);
 
-		int accepted = Math.min(Math.min(getMaxOutput(),getMaxInput()), maxReceive);
-		accepted = Math.min(getMaxOutput()-energyStored, accepted);
-		if(accepted<=0)
-			return 0;
+        ForgeDirection fd = ForgeDirection.getOrientation(facing);
+        TileEntity capacitor = worldObj.getTileEntity(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ);
+        int ret = 0;
+        if (capacitor instanceof IEnergyReceiver && ((IEnergyReceiver) capacitor).canConnectEnergy(fd.getOpposite()))
+            ret = ((IEnergyReceiver) capacitor).receiveEnergy(fd.getOpposite(), toAccept, simulate);
+        else if (Lib.IC2 && IC2Helper.isAcceptingEnergySink(capacitor, this, fd.getOpposite())) {
+            double left = IC2Helper.injectEnergy(
+                capacitor,
+                fd.getOpposite(),
+                ModCompatability.convertRFtoEU(toAccept, getIC2Tier()),
+                canTakeHV() ? (256 * 256) : canTakeMV() ? (128 * 128) : (32 * 32),
+                simulate);
+            ret = toAccept - ModCompatability.convertEUtoRF(left);
+        } else if (Lib.GREG && GregTechHelper.gregtech_isValidEnergyOutput(capacitor)) {
+            long translAmount = (long) ModCompatability.convertRFtoEU(toAccept, getIC2Tier());
+            long accepted = GregTechHelper.gregtech_outputGTPower(
+                capacitor,
+                (byte) fd.getOpposite()
+                    .ordinal(),
+                translAmount,
+                1L,
+                simulate);
+            int reConv = ModCompatability.convertEUtoRF(accepted);
+            ret = reConv;
+        }
+        if (!simulate) currentTickAccepted += ret;
+        return ret;
+    }
 
-		if(!simulate)
-		{
-			energyStored += accepted;
-			lastTransfer = worldObj.getTotalWorldTime();
-			markDirty();
-		}
+    @Override
+    public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket) {
+        super.writeCustomNBT(nbt, descPacket);
+        nbt.setInteger("facing", facing);
+        nbt.setLong("lastTransfer", lastTransfer);
+        nbt.setInteger("stored", energyStored);
+    }
 
-		return accepted;
-	}
-	@Override
-	public int getEnergyStored(ForgeDirection from)
-	{
-		return energyStored;
-	}
-	@Override
-	public int getMaxEnergyStored(ForgeDirection from)
-	{
-		return getMaxInput();
-	}
-	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract,boolean simulate)
-	{
-		return 0;
-	}
+    @Override
+    public void readCustomNBT(NBTTagCompound nbt, boolean descPacket) {
+        super.readCustomNBT(nbt, descPacket);
+        facing = nbt.getInteger("facing");
+        lastTransfer = nbt.getLong("lastTransfer");
+        energyStored = nbt.getInteger("stored");
+    }
 
-	public int transferEnergy(int energy, boolean simulate, final int energyType)
-	{
-		int received = 0;
-		if(!worldObj.isRemote)
-		{
-			Set<AbstractConnection> outputs = ImmersiveNetHandler.INSTANCE.getIndirectEnergyConnections(Utils.toCC(this), worldObj);
-			int powerLeft = Math.min(Math.min(getMaxOutput(),getMaxInput()), energy);
-			final int powerForSort = powerLeft;
+    @Override
+    public Vec3 getRaytraceOffset(IImmersiveConnectable link) {
+        ForgeDirection fd = ForgeDirection.getOrientation(facing)
+            .getOpposite();
+        return Vec3.createVectorHelper(.5 + fd.offsetX * .0625, .5 + fd.offsetY * .0625, .5 + fd.offsetZ * .0625);
+    }
 
-			if(outputs.size()<1)
-				return 0;
+    @Override
+    public Vec3 getConnectionOffset(Connection con) {
+        ForgeDirection fd = ForgeDirection.getOrientation(facing)
+            .getOpposite();
+        double conRadius = con.cableType.getRenderDiameter() / 2;
+        return Vec3
+            .createVectorHelper(.5 - conRadius * fd.offsetX, .5 - conRadius * fd.offsetY, .5 - conRadius * fd.offsetZ);
+    }
 
-			int sum = 0;
-			HashMap<AbstractConnection,Integer> powerSorting = new HashMap<AbstractConnection,Integer>();
-			for(AbstractConnection con : outputs)
-			{
-				IImmersiveConnectable end = toIIC(con.end, worldObj);
-				if(con.cableType!=null && end!=null)
-				{
-					int atmOut = Math.min(powerForSort,con.cableType.getTransferRate());
-					int tempR = end.outputEnergy(atmOut, true, energyType);
-					if(tempR>0)
-					{
-						powerSorting.put(con, tempR);
-						sum += tempR;
-					}
-				}
-			}
+    @SideOnly(Side.CLIENT)
+    private AxisAlignedBB renderAABB;
 
-			if(sum>0)
-				for(AbstractConnection con : powerSorting.keySet())
-				{
-					IImmersiveConnectable end = toIIC(con.end, worldObj);
-					if(con.cableType!=null && end!=null)
-					{
-						int output = powerSorting.get(con);
+    @SideOnly(Side.CLIENT)
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        if (renderAABB == null) {
+            if (Config.getBoolean("increasedRenderboxes")) {
+                int inc = getRenderRadiusIncrease();
+                renderAABB = AxisAlignedBB.getBoundingBox(
+                    xCoord - inc,
+                    yCoord - inc,
+                    zCoord - inc,
+                    xCoord + inc + 1,
+                    yCoord + inc + 1,
+                    zCoord + inc + 1);
+            } else renderAABB = super.getRenderBoundingBox();
+        }
+        return renderAABB;
+    }
 
-						int tempR = end.outputEnergy(Math.min(output, con.cableType.getTransferRate()), true, energyType);
-						int r = tempR;
-						int maxInput = getMaxInput();
-						tempR -= (int) Math.max(0, Math.floor(tempR*con.getPreciseLossRate(tempR,maxInput)));
-						end.outputEnergy(tempR, simulate, energyType);
-						HashSet<IImmersiveConnectable> passedConnectors = new HashSet<IImmersiveConnectable>();
-						float intermediaryLoss = 0;
-						for(Connection sub : con.subConnections)
-						{
-							float length = sub.length/(float)sub.cableType.getMaxLength();
-							float baseLoss = (float)sub.cableType.getLossRatio();
-							float mod = (((maxInput-tempR)/(float)maxInput)/.25f)*.1f;
-							intermediaryLoss = MathHelper.clamp_float(intermediaryLoss+length*(baseLoss+baseLoss*mod), 0,1);
+    int getRenderRadiusIncrease() {
+        return WireType.COPPER.getMaxLength();
+    }
 
-							int transferredPerCon = ImmersiveNetHandler.INSTANCE.getTransferedRates(worldObj.provider.dimensionId).containsKey(sub)?ImmersiveNetHandler.INSTANCE.getTransferedRates(worldObj.provider.dimensionId).get(sub):0;
-							transferredPerCon += r;
-							if(!simulate)
-							{
-								ImmersiveNetHandler.INSTANCE.getTransferedRates(worldObj.provider.dimensionId).put(sub,transferredPerCon);
-								IImmersiveConnectable subStart = toIIC(sub.start,worldObj);
-								IImmersiveConnectable subEnd = toIIC(sub.end,worldObj);
-								if(subStart!=null && passedConnectors.add(subStart))
-									subStart.onEnergyPassthrough((int)(r-r*intermediaryLoss));
-								if(subEnd!=null && passedConnectors.add(subEnd))
-									subEnd.onEnergyPassthrough((int)(r-r*intermediaryLoss));
-							}
-						}
-						received += r;
-						powerLeft -= r;
-						if(powerLeft<=0)
-							break;
-					}
-				}
-		}
-		return received;
-	}
+    @Override
+    public boolean canConnectEnergy(ForgeDirection from) {
+        return from.ordinal() == facing;
+    }
 
+    @Override
+    public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+        if (worldObj.isRemote) return 0;
+        if (worldObj.getTotalWorldTime() == lastTransfer) return 0;
 
-	public int getMaxInput()
-	{
-		return connectorInputValues[0];
-	}
-	public int getMaxOutput()
-	{
-		return connectorInputValues[0];
-	}
+        int accepted = Math.min(Math.min(getMaxOutput(), getMaxInput()), maxReceive);
+        accepted = Math.min(getMaxOutput() - energyStored, accepted);
+        if (accepted <= 0) return 0;
 
-	@Optional.Method(modid = "IC2")
-	public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction)
-	{
-		return Lib.IC2 && canConnectEnergy(direction);
-	}
-	@Optional.Method(modid = "IC2")
-	public double getDemandedEnergy()
-	{
-		return ModCompatability.convertRFtoEU(getMaxInput()-energyStored, getIC2Tier());
-	}
-	@Optional.Method(modid = "IC2")
-	public int getSinkTier()
-	{
-		return getIC2Tier();
-	}
-	int getIC2Tier()
-	{
-		return this.canTakeHV()?3: this.canTakeMV()?2: 1;
-	}
-	@Optional.Method(modid = "IC2")
-	public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage)
-	{
-		int rf = ModCompatability.convertEUtoRF(amount);
-		int r = Math.min(getMaxInput()-energyStored, rf);
-		energyStored+=r;
-		double eu = ModCompatability.convertRFtoEU(r, getIC2Tier());
-		return amount-eu;
-	}
+        if (!simulate) {
+            energyStored += accepted;
+            lastTransfer = worldObj.getTotalWorldTime();
+            markDirty();
+        }
+
+        return accepted;
+    }
+
+    @Override
+    public int getEnergyStored(ForgeDirection from) {
+        return energyStored;
+    }
+
+    @Override
+    public int getMaxEnergyStored(ForgeDirection from) {
+        return getMaxInput();
+    }
+
+    @Override
+    public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
+        return 0;
+    }
+
+    public int transferEnergy(int energy, boolean simulate, final int energyType) {
+        int received = 0;
+        if (!worldObj.isRemote) {
+            Set<AbstractConnection> outputs = ImmersiveNetHandler.INSTANCE
+                .getIndirectEnergyConnections(Utils.toCC(this), worldObj);
+            int powerLeft = Math.min(Math.min(getMaxOutput(), getMaxInput()), energy);
+            final int powerForSort = powerLeft;
+
+            if (outputs.size() < 1) return 0;
+
+            int sum = 0;
+            HashMap<AbstractConnection, Integer> powerSorting = new HashMap<AbstractConnection, Integer>();
+            for (AbstractConnection con : outputs) {
+                IImmersiveConnectable end = toIIC(con.end, worldObj);
+                if (con.cableType != null && end != null) {
+                    int atmOut = Math.min(powerForSort, con.cableType.getTransferRate());
+                    int tempR = end.outputEnergy(atmOut, true, energyType);
+                    if (tempR > 0) {
+                        powerSorting.put(con, tempR);
+                        sum += tempR;
+                    }
+                }
+            }
+
+            if (sum > 0) for (AbstractConnection con : powerSorting.keySet()) {
+                IImmersiveConnectable end = toIIC(con.end, worldObj);
+                if (con.cableType != null && end != null) {
+                    int output = powerSorting.get(con);
+
+                    int tempR = end.outputEnergy(Math.min(output, con.cableType.getTransferRate()), true, energyType);
+                    int r = tempR;
+                    int maxInput = getMaxInput();
+                    tempR -= (int) Math.max(0, Math.floor(tempR * con.getPreciseLossRate(tempR, maxInput)));
+                    end.outputEnergy(tempR, simulate, energyType);
+                    HashSet<IImmersiveConnectable> passedConnectors = new HashSet<IImmersiveConnectable>();
+                    float intermediaryLoss = 0;
+                    for (Connection sub : con.subConnections) {
+                        float length = sub.length / (float) sub.cableType.getMaxLength();
+                        float baseLoss = (float) sub.cableType.getLossRatio();
+                        float mod = (((maxInput - tempR) / (float) maxInput) / .25f) * .1f;
+                        intermediaryLoss = MathHelper
+                            .clamp_float(intermediaryLoss + length * (baseLoss + baseLoss * mod), 0, 1);
+
+                        int transferredPerCon = ImmersiveNetHandler.INSTANCE
+                            .getTransferedRates(worldObj.provider.dimensionId)
+                            .containsKey(sub)
+                                ? ImmersiveNetHandler.INSTANCE.getTransferedRates(worldObj.provider.dimensionId)
+                                    .get(sub)
+                                : 0;
+                        transferredPerCon += r;
+                        if (!simulate) {
+                            ImmersiveNetHandler.INSTANCE.getTransferedRates(worldObj.provider.dimensionId)
+                                .put(sub, transferredPerCon);
+                            IImmersiveConnectable subStart = toIIC(sub.start, worldObj);
+                            IImmersiveConnectable subEnd = toIIC(sub.end, worldObj);
+                            if (subStart != null && passedConnectors.add(subStart))
+                                subStart.onEnergyPassthrough((int) (r - r * intermediaryLoss));
+                            if (subEnd != null && passedConnectors.add(subEnd))
+                                subEnd.onEnergyPassthrough((int) (r - r * intermediaryLoss));
+                        }
+                    }
+                    received += r;
+                    powerLeft -= r;
+                    if (powerLeft <= 0) break;
+                }
+            }
+        }
+        return received;
+    }
+
+    public int getMaxInput() {
+        return connectorInputValues[0];
+    }
+
+    public int getMaxOutput() {
+        return connectorInputValues[0];
+    }
+
+    @Optional.Method(modid = "IC2")
+    public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction) {
+        return Lib.IC2 && canConnectEnergy(direction);
+    }
+
+    @Optional.Method(modid = "IC2")
+    public double getDemandedEnergy() {
+        return ModCompatability.convertRFtoEU(getMaxInput() - energyStored, getIC2Tier());
+    }
+
+    @Optional.Method(modid = "IC2")
+    public int getSinkTier() {
+        return getIC2Tier();
+    }
+
+    int getIC2Tier() {
+        return this.canTakeHV() ? 3 : this.canTakeMV() ? 2 : 1;
+    }
+
+    @Optional.Method(modid = "IC2")
+    public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage) {
+        int rf = ModCompatability.convertEUtoRF(amount);
+        int r = Math.min(getMaxInput() - energyStored, rf);
+        energyStored += r;
+        double eu = ModCompatability.convertRFtoEU(r, getIC2Tier());
+        return amount - eu;
+    }
 }

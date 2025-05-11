@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumSkyBlock;
+
 import blusunrize.immersiveengineering.api.energy.IImmersiveConnectable;
 import blusunrize.immersiveengineering.api.energy.ImmersiveNetHandler.Connection;
 import blusunrize.immersiveengineering.common.Config;
@@ -13,131 +14,115 @@ import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.ISpawnInt
 import blusunrize.immersiveengineering.common.blocks.TileEntityImmersiveConnectable;
 import blusunrize.immersiveengineering.common.util.Utils;
 
-public class TileEntityElectricLantern extends TileEntityImmersiveConnectable implements ISpawnInterdiction
-{
-	public int energyStorage = 0;
-	public boolean active = false;
-	private boolean interdictionList=false; 
+public class TileEntityElectricLantern extends TileEntityImmersiveConnectable implements ISpawnInterdiction {
 
-	@Override
-	public void updateEntity()
-	{
-		if(worldObj.isRemote)
-			return;
-		if(!interdictionList && Config.getBoolean("lantern_spawnPrevent"))
-		{
-			synchronized (EventHandler.interdictionTiles) {
-				if (!EventHandler.interdictionTiles.contains(this))
-					EventHandler.interdictionTiles.add(this);
-			}
-			interdictionList=true;
-		}
-		boolean b = active;
-		if(energyStorage>0)
-		{
-			energyStorage--;
-			if(!active)
-				active=true;
-		}
-		else if(active)
-			active=false;
+    public int energyStorage = 0;
+    public boolean active = false;
+    private boolean interdictionList = false;
 
-		if(active!=b)
-		{
-			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-			worldObj.updateLightByType(EnumSkyBlock.Block, xCoord, yCoord, zCoord);
-			worldObj.addBlockEvent(xCoord, yCoord, zCoord, getBlockType(), 1, 0);
-		}
-	}
+    @Override
+    public void updateEntity() {
+        if (worldObj.isRemote) return;
+        if (!interdictionList && Config.getBoolean("lantern_spawnPrevent")) {
+            synchronized (EventHandler.interdictionTiles) {
+                if (!EventHandler.interdictionTiles.contains(this)) EventHandler.interdictionTiles.add(this);
+            }
+            interdictionList = true;
+        }
+        boolean b = active;
+        if (energyStorage > 0) {
+            energyStorage--;
+            if (!active) active = true;
+        } else if (active) active = false;
 
-	@Override
-	public double getInterdictionRangeSquared()
-	{
-		return active?1024:0;
-	}
+        if (active != b) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            worldObj.updateLightByType(EnumSkyBlock.Block, xCoord, yCoord, zCoord);
+            worldObj.addBlockEvent(xCoord, yCoord, zCoord, getBlockType(), 1, 0);
+        }
+    }
 
-	@Override
-	public void invalidate()
-	{
-		synchronized (EventHandler.interdictionTiles) {
-			if (EventHandler.interdictionTiles.contains(this))
-				EventHandler.interdictionTiles.remove(this);
-		}
-		super.invalidate();
-	}
-	
-	@Override
-	public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
-	{
-		super.readCustomNBT(nbt, descPacket);
-		active = nbt.getBoolean("active");
-		energyStorage = nbt.getInteger("energyStorage");
-	}
+    @Override
+    public double getInterdictionRangeSquared() {
+        return active ? 1024 : 0;
+    }
 
-	@Override
-	public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
-	{
-		super.writeCustomNBT(nbt, descPacket);
-		nbt.setBoolean("active",active);
-		nbt.setInteger("energyStorage",energyStorage);
-	}
+    @Override
+    public void invalidate() {
+        synchronized (EventHandler.interdictionTiles) {
+            if (EventHandler.interdictionTiles.contains(this)) EventHandler.interdictionTiles.remove(this);
+        }
+        super.invalidate();
+    }
 
-	@Override
-	protected boolean canTakeLV()
-	{
-		return true;
-	}
-	@Override
-	public boolean isEnergyOutput()
-	{
-		return true;
-	}
-	@Override
-	public int outputEnergy(int amount, boolean simulate, int energyType)
-	{
-		if(amount>0 && energyStorage<10)
-		{
-			if(!simulate)
-			{
-				int rec = Math.min(10-energyStorage, 2);
-				energyStorage+=rec;
-				return rec;
-			}
-			return Math.min(10-energyStorage, 2);
-		}
-		return 0;
-	}
-	@Override
-	public boolean receiveClientEvent(int id, int arg)
-	{
-		if(id==1)
-		{
-			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-			worldObj.updateLightByType(EnumSkyBlock.Block, xCoord, yCoord, zCoord);
-			return true;
-		}
-		return super.receiveClientEvent(id, arg);
-	}
-	@Override
-	public Vec3 getRaytraceOffset(IImmersiveConnectable link)
-	{
-		int xDif = xCoord - ((TileEntity)link).xCoord;
-		int zDif = zCoord - ((TileEntity)link).zCoord;
-		if(xDif==0&&zDif==0)
-			return Vec3.createVectorHelper(.5, .0625, .5);
-		else if(Math.abs(xDif)>=Math.abs(zDif))
-			return Vec3.createVectorHelper(xDif<0?.25:xDif>0?.75:.5, .0625, .5);
-		else
-			return Vec3.createVectorHelper(.5, .0625, zDif<0?.25:zDif>0?.75:.5);
-	}
-	@Override
-	public Vec3 getConnectionOffset(Connection con)
-	{
-		ChunkCoordinates here = Utils.toCC(this);
-		int xDif = (con==null||con.start==null||con.end==null)?0: (con.start.equals(here)&&con.end!=null)? con.end.posX-xCoord: (con.end.equals(here)&& con.start!=null)?con.start.posX-xCoord: 0;
-		int zDif = (con==null||con.start==null||con.end==null)?0: (con.start.equals(here)&&con.end!=null)? con.end.posZ-zCoord: (con.end.equals(here)&& con.start!=null)?con.start.posZ-zCoord: 0;
-		if(Math.abs(xDif)>=Math.abs(zDif))
-			return Vec3.createVectorHelper(xDif<0?.25:xDif>0?.75:.5, .0625, .5);
-		return Vec3.createVectorHelper(.5, .0625, zDif<0?.25:zDif>0?.75:.5);
-	}
+    @Override
+    public void readCustomNBT(NBTTagCompound nbt, boolean descPacket) {
+        super.readCustomNBT(nbt, descPacket);
+        active = nbt.getBoolean("active");
+        energyStorage = nbt.getInteger("energyStorage");
+    }
+
+    @Override
+    public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket) {
+        super.writeCustomNBT(nbt, descPacket);
+        nbt.setBoolean("active", active);
+        nbt.setInteger("energyStorage", energyStorage);
+    }
+
+    @Override
+    protected boolean canTakeLV() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnergyOutput() {
+        return true;
+    }
+
+    @Override
+    public int outputEnergy(int amount, boolean simulate, int energyType) {
+        if (amount > 0 && energyStorage < 10) {
+            if (!simulate) {
+                int rec = Math.min(10 - energyStorage, 2);
+                energyStorage += rec;
+                return rec;
+            }
+            return Math.min(10 - energyStorage, 2);
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean receiveClientEvent(int id, int arg) {
+        if (id == 1) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            worldObj.updateLightByType(EnumSkyBlock.Block, xCoord, yCoord, zCoord);
+            return true;
+        }
+        return super.receiveClientEvent(id, arg);
+    }
+
+    @Override
+    public Vec3 getRaytraceOffset(IImmersiveConnectable link) {
+        int xDif = xCoord - ((TileEntity) link).xCoord;
+        int zDif = zCoord - ((TileEntity) link).zCoord;
+        if (xDif == 0 && zDif == 0) return Vec3.createVectorHelper(.5, .0625, .5);
+        else if (Math.abs(xDif) >= Math.abs(zDif))
+            return Vec3.createVectorHelper(xDif < 0 ? .25 : xDif > 0 ? .75 : .5, .0625, .5);
+        else return Vec3.createVectorHelper(.5, .0625, zDif < 0 ? .25 : zDif > 0 ? .75 : .5);
+    }
+
+    @Override
+    public Vec3 getConnectionOffset(Connection con) {
+        ChunkCoordinates here = Utils.toCC(this);
+        int xDif = (con == null || con.start == null || con.end == null) ? 0
+            : (con.start.equals(here) && con.end != null) ? con.end.posX - xCoord
+                : (con.end.equals(here) && con.start != null) ? con.start.posX - xCoord : 0;
+        int zDif = (con == null || con.start == null || con.end == null) ? 0
+            : (con.start.equals(here) && con.end != null) ? con.end.posZ - zCoord
+                : (con.end.equals(here) && con.start != null) ? con.start.posZ - zCoord : 0;
+        if (Math.abs(xDif) >= Math.abs(zDif))
+            return Vec3.createVectorHelper(xDif < 0 ? .25 : xDif > 0 ? .75 : .5, .0625, .5);
+        return Vec3.createVectorHelper(.5, .0625, zDif < 0 ? .25 : zDif > 0 ? .75 : .5);
+    }
 }

@@ -5,77 +5,62 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+
 import blusunrize.immersiveengineering.api.crafting.CokeOvenRecipe;
 import blusunrize.immersiveengineering.common.blocks.stone.TileEntityCokeOven;
 
-public class ContainerCokeOven extends Container
-{
-	TileEntityCokeOven tile;
-	int slotCount;
-	public ContainerCokeOven(InventoryPlayer inventoryPlayer, TileEntityCokeOven tile)
-	{
-		this.tile=tile;
+public class ContainerCokeOven extends Container {
 
-		this.addSlotToContainer(new IESlot(this, tile, 0, 30, 35)
-		{
-			@Override
-			public boolean isItemValid(ItemStack itemStack)
-			{
-				return CokeOvenRecipe.findRecipe(itemStack)!=null;
-			}
-		});
-		this.addSlotToContainer(new IESlot.Output(this, tile, 1, 85, 35));
-		this.addSlotToContainer(new IESlot.FluidContainer(this, tile, 2,152, 17, true));
-		this.addSlotToContainer(new IESlot.Output(this, tile, 3,152, 53));
-		slotCount=4;
+    TileEntityCokeOven tile;
+    int slotCount;
 
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 9; j++)
-				addSlotToContainer(new Slot(inventoryPlayer, j+i*9+9, 8+j*18, 84+i*18));
-		for (int i = 0; i < 9; i++)
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8+i*18, 142));
-	}
+    public ContainerCokeOven(InventoryPlayer inventoryPlayer, TileEntityCokeOven tile) {
+        this.tile = tile;
 
-	@Override
-	public boolean canInteractWith(EntityPlayer p_75145_1_)
-	{
-		return tile.isUseableByPlayer(p_75145_1_);
-	}
+        this.addSlotToContainer(new IESlot(this, tile, 0, 30, 35) {
 
+            @Override
+            public boolean isItemValid(ItemStack itemStack) {
+                return CokeOvenRecipe.findRecipe(itemStack) != null;
+            }
+        });
+        this.addSlotToContainer(new IESlot.Output(this, tile, 1, 85, 35));
+        this.addSlotToContainer(new IESlot.FluidContainer(this, tile, 2, 152, 17, true));
+        this.addSlotToContainer(new IESlot.Output(this, tile, 3, 152, 53));
+        slotCount = 4;
 
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int slot)
-	{
-		ItemStack stack = null;
-		Slot slotObject = (Slot) inventorySlots.get(slot);
+        for (int i = 0; i < 3; i++) for (int j = 0; j < 9; j++)
+            addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+        for (int i = 0; i < 9; i++) addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
+    }
 
-		if (slotObject != null && slotObject.getHasStack())
-		{
-			ItemStack stackInSlot = slotObject.getStack();
-			stack = stackInSlot.copy();
+    @Override
+    public boolean canInteractWith(EntityPlayer p_75145_1_) {
+        return tile.isUseableByPlayer(p_75145_1_);
+    }
 
-			if (slot < slotCount)
-			{
-				if(!this.mergeItemStack(stackInSlot, slotCount, (slotCount + 36), true))
-					return null;
-			}
-			else
-			{
-				for(int i=0;i<slotCount;i++)
-					if(this.getSlot(i).isItemValid(stackInSlot))
-						if(!this.mergeItemStack(stackInSlot, i,i+1, false))
-							return null;
-			}
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
+        ItemStack stack = null;
+        Slot slotObject = (Slot) inventorySlots.get(slot);
 
-			if (stackInSlot.stackSize == 0)
-				slotObject.putStack(null);
-			else
-				slotObject.onSlotChanged();
+        if (slotObject != null && slotObject.getHasStack()) {
+            ItemStack stackInSlot = slotObject.getStack();
+            stack = stackInSlot.copy();
 
-			if (stackInSlot.stackSize == stack.stackSize)
-				return null;
-			slotObject.onPickupFromSlot(player, stackInSlot);
-		}
-		return stack;
-	}
+            if (slot < slotCount) {
+                if (!this.mergeItemStack(stackInSlot, slotCount, (slotCount + 36), true)) return null;
+            } else {
+                for (int i = 0; i < slotCount; i++) if (this.getSlot(i)
+                    .isItemValid(stackInSlot)) if (!this.mergeItemStack(stackInSlot, i, i + 1, false)) return null;
+            }
+
+            if (stackInSlot.stackSize == 0) slotObject.putStack(null);
+            else slotObject.onSlotChanged();
+
+            if (stackInSlot.stackSize == stack.stackSize) return null;
+            slotObject.onPickupFromSlot(player, stackInSlot);
+        }
+        return stack;
+    }
 }

@@ -22,146 +22,163 @@ import blusunrize.immersiveengineering.common.blocks.metal.BlockMetalMultiblocks
 import blusunrize.immersiveengineering.common.blocks.metal.TileEntityBottlingMachine;
 import blusunrize.immersiveengineering.common.util.chickenbones.Matrix4;
 
-public class TileRenderBottlingMachine extends TileRenderIE
-{
-	ModelIEObj model = new ModelIEObj("immersiveengineering:models/bottlingMachine.obj")
-	{
-		@Override
-		public IIcon getBlockIcon(String groupName)
-		{
-			if(groupName.equalsIgnoreCase("conveyors"))
-				return IEContent.blockMetalDevice.getIcon(0, BlockMetalDevices.META_conveyorBelt);
-			return IEContent.blockMetalMultiblocks.getIcon(0, BlockMetalMultiblocks.META_bottlingMachine);
-		}
-	};
+public class TileRenderBottlingMachine extends TileRenderIE {
 
-	@Override
-	public void renderStatic(TileEntity tile, Tessellator tes, Matrix4 translationMatrix, Matrix4 rotationMatrix)
-	{
-		TileEntityBottlingMachine bottler = (TileEntityBottlingMachine)tile;
+    ModelIEObj model = new ModelIEObj("immersiveengineering:models/bottlingMachine.obj") {
 
-		translationMatrix.translate(.5, 0, .5);
-		rotationMatrix.rotate(Math.toRadians(bottler.facing==3?180: bottler.facing==4?90: bottler.facing==5?-90: 0), 0,1,0);
-		if(bottler.mirrored)
-			translationMatrix.scale(new Vertex(bottler.facing<4?-1:1,1,bottler.facing>3?-1:1));
+        @Override
+        public IIcon getBlockIcon(String groupName) {
+            if (groupName.equalsIgnoreCase("conveyors"))
+                return IEContent.blockMetalDevice.getIcon(0, BlockMetalDevices.META_conveyorBelt);
+            return IEContent.blockMetalMultiblocks.getIcon(0, BlockMetalMultiblocks.META_bottlingMachine);
+        }
+    };
 
-		model.render(tile, tes, translationMatrix, rotationMatrix, 0, bottler.mirrored, "conveyors","base");
-	}
-	@Override
-	public void renderDynamic(TileEntity tile, double x, double y, double z, float f)
-	{
-		TileEntityBottlingMachine bottler = (TileEntityBottlingMachine)tile;
-		if(!bottler.formed || bottler.pos!=4)
-			return;
-		GL11.glPushMatrix();
-		GL11.glTranslated(x+.5, y, z+.5);
-		GL11.glRotated(bottler.facing==3?180: bottler.facing==4?90: bottler.facing==5?-90: 0, 0,1,0);
-		double shift = .3358;
+    @Override
+    public void renderStatic(TileEntity tile, Tessellator tes, Matrix4 translationMatrix, Matrix4 rotationMatrix) {
+        TileEntityBottlingMachine bottler = (TileEntityBottlingMachine) tile;
 
-		Matrix4 translationMatrix = new Matrix4();
-		Matrix4 rotationMatrix = new Matrix4();
-		if(bottler.mirrored)
-			GL11.glScalef(-1,1,1);
+        translationMatrix.translate(.5, 0, .5);
+        rotationMatrix.rotate(
+            Math.toRadians(bottler.facing == 3 ? 180 : bottler.facing == 4 ? 90 : bottler.facing == 5 ? -90 : 0),
+            0,
+            1,
+            0);
+        if (bottler.mirrored)
+            translationMatrix.scale(new Vertex(bottler.facing < 4 ? -1 : 1, 1, bottler.facing > 3 ? -1 : 1));
 
-		GL11.glTranslated(shift/2,0,0);
+        model.render(tile, tes, translationMatrix, rotationMatrix, 0, bottler.mirrored, "conveyors", "base");
+    }
 
-		double d0 = .05867077;
-		double d1 = .08265846;
-		double tapShift = 0;
+    @Override
+    public void renderDynamic(TileEntity tile, double x, double y, double z, float f) {
+        TileEntityBottlingMachine bottler = (TileEntityBottlingMachine) tile;
+        if (!bottler.formed || bottler.pos != 4) return;
+        GL11.glPushMatrix();
+        GL11.glTranslated(x + .5, y, z + .5);
+        GL11.glRotated(bottler.facing == 3 ? 180 : bottler.facing == 4 ? 90 : bottler.facing == 5 ? -90 : 0, 0, 1, 0);
+        double shift = .3358;
 
-		for(int i=0; i<bottler.inventory.length; i++)
-			if(bottler.inventory[i]!=null && bottler.process[i]!=-1)
-			{
-				float step = bottler.process[i]/120f;
-				double fill = step>=.4+d0+d1*1.5?1:0;
-				if(bottler.predictedOutput[i]!=null)
-					if(step>=.4+d0 && step<.4+d0+d1)
-						fill = tapShift = (step-.4-d0)/d1;
-					else if(step>=.4+d0+d1 && step<.4+d0+d1*1.5)
-						fill = tapShift = 1;
-					else if(step>=.4+d0+d1*1.5 && step<.4+d0+d1*2.5)
-						tapShift = 1-(step-.4-d0-d1*1.5)/d1;
+        Matrix4 translationMatrix = new Matrix4();
+        Matrix4 rotationMatrix = new Matrix4();
+        if (bottler.mirrored) GL11.glScalef(-1, 1, 1);
 
-				GL11.glPushMatrix();
-				GL11.glTranslated(1,1.15625,.5);
-				double itemX = 0;
-				double itemY = 0;
-				double itemZ = 0;
-				itemX = -( step<.18?0: step<.4?((step-.18)/.22)*.75: step<.6?.75+((step-.40)/.2)*.8125: step<.82?1.5625+(step-.6)/.22*.75: 2.3125);
-				itemZ = -( step<.18?step/.18*.9: step<.4?.9+((step-.18)/.22)*.7875: step<.6? 1.6875: step<.82?1.6875-((step-.6)/.22)*.7875: (1-step)/.18 * .9);
+        GL11.glTranslated(shift / 2, 0, 0);
 
-				GL11.glTranslated(itemX,itemY,itemZ);
+        double d0 = .05867077;
+        double d1 = .08265846;
+        double tapShift = 0;
 
-				if(bottler.mirrored)
-					GL11.glScalef(-1,1,1);
-				renderItemToFill(bottler.inventory[i], bottler.predictedOutput[i], (float)fill, step>=.71, bottler.getWorldObj(), bottler.facing);
-				GL11.glPopMatrix();
-			}
+        for (int i = 0; i < bottler.inventory.length; i++)
+            if (bottler.inventory[i] != null && bottler.process[i] != -1) {
+                float step = bottler.process[i] / 120f;
+                double fill = step >= .4 + d0 + d1 * 1.5 ? 1 : 0;
+                if (bottler.predictedOutput[i] != null)
+                    if (step >= .4 + d0 && step < .4 + d0 + d1) fill = tapShift = (step - .4 - d0) / d1;
+                else if (step >= .4 + d0 + d1 && step < .4 + d0 + d1 * 1.5) fill = tapShift = 1;
+                else if (step >= .4 + d0 + d1 * 1.5 && step < .4 + d0 + d1 * 2.5)
+                    tapShift = 1 - (step - .4 - d0 - d1 * 1.5) / d1;
 
-		GL11.glTranslated(-shift*tapShift,0,0);
-		Tessellator tes = ClientUtils.tes();
-		ClientUtils.bindAtlas(0);
-		tes.startDrawingQuads();
-		model.render(tile, tes, translationMatrix,rotationMatrix, 0, bottler.mirrored, "tap");
-		tes.draw();
-		GL11.glTranslated(shift*tapShift,0,0);
+                GL11.glPushMatrix();
+                GL11.glTranslated(1, 1.15625, .5);
+                double itemX = 0;
+                double itemY = 0;
+                double itemZ = 0;
+                itemX = -(step < .18 ? 0
+                    : step < .4 ? ((step - .18) / .22) * .75
+                        : step < .6 ? .75 + ((step - .40) / .2) * .8125
+                            : step < .82 ? 1.5625 + (step - .6) / .22 * .75 : 2.3125);
+                itemZ = -(step < .18 ? step / .18 * .9
+                    : step < .4 ? .9 + ((step - .18) / .22) * .7875
+                        : step < .6 ? 1.6875
+                            : step < .82 ? 1.6875 - ((step - .6) / .22) * .7875 : (1 - step) / .18 * .9);
 
-		GL11.glPopMatrix();
-	}
+                GL11.glTranslated(itemX, itemY, itemZ);
 
-	static void renderItemToFill(ItemStack empty, ItemStack full, float fill, boolean packaged, World world, int machineRotation)
-	{
-		if(empty==null)
-			return;
-		if(full!=null && MinecraftForgeClient.getItemRenderer(empty, ItemRenderType.ENTITY)==null && MinecraftForgeClient.getItemRenderer(full, ItemRenderType.ENTITY)==null && empty.getItemSpriteNumber()==1 && full.getItemSpriteNumber()==1)
-		{
-			GL11.glPushMatrix();
-			ClientUtils.bindAtlas(1);
-			GL11.glTranslated(.0,-.0525,.0625/6);
-			GL11.glScalef(.51f, .51f, .51f);
+                if (bottler.mirrored) GL11.glScalef(-1, 1, 1);
+                renderItemToFill(
+                    bottler.inventory[i],
+                    bottler.predictedOutput[i],
+                    (float) fill,
+                    step >= .71,
+                    bottler.getWorldObj(),
+                    bottler.facing);
+                GL11.glPopMatrix();
+            }
 
-			if(fill>0)
-				for(int pass=0; pass<full.getItem().getRenderPasses(full.getItemDamage()); pass++)
-				{
-					IIcon iconFull = full.getItem().getIcon(full, pass);
-					int h = Math.round(fill*iconFull.getIconHeight());
-					double pxFill = h/(double)iconFull.getIconHeight();
-					int col = full.getItem().getColorFromItemStack(full, pass);
-					GL11.glColor3f((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f);
-					ClientUtils.renderItemIn2D(iconFull, new double[]{0,1,1-pxFill,1}, iconFull.getIconWidth(),h, .0625f);
-					GL11.glColor3f(1,1,1);
-				}
-			if(fill<1)
-				for(int pass=0; pass<empty.getItem().getRenderPasses(empty.getItemDamage()); pass++)
-				{
-					IIcon iconEmpty = empty.getItem().getIcon(empty, pass);
-					int h = Math.round((1-fill)*iconEmpty.getIconHeight());
-					double pxFill = h/(double)iconEmpty.getIconHeight();
-					GL11.glTranslated(0,1-pxFill,0);
-					int col = empty.getItem().getColorFromItemStack(empty, pass);
-					GL11.glColor3f((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f);
-					ClientUtils.renderItemIn2D(iconEmpty, new double[]{0,1,0,pxFill}, iconEmpty.getIconWidth(),h, .0625f);
-					GL11.glColor3f(1,1,1);
-					GL11.glTranslated(0,-1-pxFill,0);
-				}
-			GL11.glPopMatrix();
-		}
-		else
-		{
-			if(!RenderManager.instance.options.fancyGraphics)
-			{
-				float rot = machineRotation==2?180: machineRotation==4?90: machineRotation==5?-90: 0;
-				GL11.glRotatef(rot - RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslated(-shift * tapShift, 0, 0);
+        Tessellator tes = ClientUtils.tes();
+        ClientUtils.bindAtlas(0);
+        tes.startDrawingQuads();
+        model.render(tile, tes, translationMatrix, rotationMatrix, 0, bottler.mirrored, "tap");
+        tes.draw();
+        GL11.glTranslated(shift * tapShift, 0, 0);
 
-			}
-			EntityItem entityitem = new EntityItem(world, 0.0D, 0.0D, 0.0D, packaged&&full!=null?full:empty);
-			entityitem.getEntityItem().stackSize = 1;
-			entityitem.hoverStart = 0.0F;
-			RenderItem.renderInFrame = true;
-			RenderManager.instance.renderEntityWithPosYaw(entityitem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
-			RenderItem.renderInFrame = false;
-		}
+        GL11.glPopMatrix();
+    }
 
+    static void renderItemToFill(ItemStack empty, ItemStack full, float fill, boolean packaged, World world,
+        int machineRotation) {
+        if (empty == null) return;
+        if (full != null && MinecraftForgeClient.getItemRenderer(empty, ItemRenderType.ENTITY) == null
+            && MinecraftForgeClient.getItemRenderer(full, ItemRenderType.ENTITY) == null
+            && empty.getItemSpriteNumber() == 1
+            && full.getItemSpriteNumber() == 1) {
+            GL11.glPushMatrix();
+            ClientUtils.bindAtlas(1);
+            GL11.glTranslated(.0, -.0525, .0625 / 6);
+            GL11.glScalef(.51f, .51f, .51f);
 
-	}
+            if (fill > 0) for (int pass = 0; pass < full.getItem()
+                .getRenderPasses(full.getItemDamage()); pass++) {
+                    IIcon iconFull = full.getItem()
+                        .getIcon(full, pass);
+                    int h = Math.round(fill * iconFull.getIconHeight());
+                    double pxFill = h / (double) iconFull.getIconHeight();
+                    int col = full.getItem()
+                        .getColorFromItemStack(full, pass);
+                    GL11.glColor3f((col >> 16 & 255) / 255f, (col >> 8 & 255) / 255f, (col & 255) / 255f);
+                    ClientUtils.renderItemIn2D(
+                        iconFull,
+                        new double[] { 0, 1, 1 - pxFill, 1 },
+                        iconFull.getIconWidth(),
+                        h,
+                        .0625f);
+                    GL11.glColor3f(1, 1, 1);
+                }
+            if (fill < 1) for (int pass = 0; pass < empty.getItem()
+                .getRenderPasses(empty.getItemDamage()); pass++) {
+                    IIcon iconEmpty = empty.getItem()
+                        .getIcon(empty, pass);
+                    int h = Math.round((1 - fill) * iconEmpty.getIconHeight());
+                    double pxFill = h / (double) iconEmpty.getIconHeight();
+                    GL11.glTranslated(0, 1 - pxFill, 0);
+                    int col = empty.getItem()
+                        .getColorFromItemStack(empty, pass);
+                    GL11.glColor3f((col >> 16 & 255) / 255f, (col >> 8 & 255) / 255f, (col & 255) / 255f);
+                    ClientUtils.renderItemIn2D(
+                        iconEmpty,
+                        new double[] { 0, 1, 0, pxFill },
+                        iconEmpty.getIconWidth(),
+                        h,
+                        .0625f);
+                    GL11.glColor3f(1, 1, 1);
+                    GL11.glTranslated(0, -1 - pxFill, 0);
+                }
+            GL11.glPopMatrix();
+        } else {
+            if (!RenderManager.instance.options.fancyGraphics) {
+                float rot = machineRotation == 2 ? 180 : machineRotation == 4 ? 90 : machineRotation == 5 ? -90 : 0;
+                GL11.glRotatef(rot - RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+
+            }
+            EntityItem entityitem = new EntityItem(world, 0.0D, 0.0D, 0.0D, packaged && full != null ? full : empty);
+            entityitem.getEntityItem().stackSize = 1;
+            entityitem.hoverStart = 0.0F;
+            RenderItem.renderInFrame = true;
+            RenderManager.instance.renderEntityWithPosYaw(entityitem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+            RenderItem.renderInFrame = false;
+        }
+
+    }
 }

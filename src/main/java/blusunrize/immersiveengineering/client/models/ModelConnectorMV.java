@@ -8,8 +8,8 @@ import net.minecraft.entity.Entity;
  * MVConnection point - Damien A.W Hazard
  * Created using Tabula 4.1.1
  */
-public class ModelConnectorMV extends ModelBase
-{
+public class ModelConnectorMV extends ModelBase {
+
     public ModelRenderer MVtop;
     public ModelRenderer ceramicMV2;
     public ModelRenderer ceramicMV3;
@@ -36,7 +36,7 @@ public class ModelConnectorMV extends ModelBase
     }
 
     @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) { 
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
         this.MVtop.render(f5);
     }
 

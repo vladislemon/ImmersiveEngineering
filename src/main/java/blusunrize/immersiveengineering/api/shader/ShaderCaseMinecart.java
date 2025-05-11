@@ -8,62 +8,56 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-public class ShaderCaseMinecart extends ShaderCase
-{
-	public static Set<Class<? extends EntityMinecart>> invalidMinecartClasses = new HashSet();
-	public String additionalTexture = null;
-	public boolean[] overlaySides = {true, true,true,true,true, true,true};
-	public boolean[] mirrorSideForPass = {true,true,true,true};
+public class ShaderCaseMinecart extends ShaderCase {
 
-	public ShaderCaseMinecart(String overlayType, int[] colourUnderlying, int[] colourPrimary, int[] colourSecondary, String additionalTexture)
-	{
-		super(overlayType, colourUnderlying,colourPrimary,colourSecondary, "immersiveengineering:textures/models/shaders/minecart_");
-		this.additionalTexture = additionalTexture;
-		if(overlayType.equals("1") || overlayType.equals("2") || overlayType.equals("7"))
-		{
-			overlaySides[1] = false;
-			overlaySides[2] = false;
-		}
-	}
+    public static Set<Class<? extends EntityMinecart>> invalidMinecartClasses = new HashSet();
+    public String additionalTexture = null;
+    public boolean[] overlaySides = { true, true, true, true, true, true, true };
+    public boolean[] mirrorSideForPass = { true, true, true, true };
 
-	@Override
-	public String getShaderType()
-	{
-		return "minecart";
-	}
+    public ShaderCaseMinecart(String overlayType, int[] colourUnderlying, int[] colourPrimary, int[] colourSecondary,
+        String additionalTexture) {
+        super(
+            overlayType,
+            colourUnderlying,
+            colourPrimary,
+            colourSecondary,
+            "immersiveengineering:textures/models/shaders/minecart_");
+        this.additionalTexture = additionalTexture;
+        if (overlayType.equals("1") || overlayType.equals("2") || overlayType.equals("7")) {
+            overlaySides[1] = false;
+            overlaySides[2] = false;
+        }
+    }
 
-	@Override
-	public int getPasses(ItemStack shader, ItemStack item, String modelPart)
-	{
-		return additionalTexture!=null?4:3;
-	}
+    @Override
+    public String getShaderType() {
+        return "minecart";
+    }
 
-	@Override
-	public IIcon getReplacementIcon(ItemStack shader, ItemStack item, String modelPart, int pass)
-	{
-		return null;
-	}
+    @Override
+    public int getPasses(ItemStack shader, ItemStack item, String modelPart) {
+        return additionalTexture != null ? 4 : 3;
+    }
 
-	@Override
-	public int[] getRGBAColourModifier(ItemStack shader, ItemStack item, String modelPart, int pass)
-	{
-		if(pass==2 && additionalTexture!=null)
-			return colourOverlay;
+    @Override
+    public IIcon getReplacementIcon(ItemStack shader, ItemStack item, String modelPart, int pass) {
+        return null;
+    }
 
-		if(pass==0)
-			return colourPrimary;
-		if(pass==1)
-			return colourSecondary;
-		return defaultWhite;
-	}
+    @Override
+    public int[] getRGBAColourModifier(ItemStack shader, ItemStack item, String modelPart, int pass) {
+        if (pass == 2 && additionalTexture != null) return colourOverlay;
 
-	@Override
-	public void stichTextures(IIconRegister ir, int sheetID)
-	{
-	}
+        if (pass == 0) return colourPrimary;
+        if (pass == 1) return colourSecondary;
+        return defaultWhite;
+    }
 
-	@Override
-	public void modifyRender(ItemStack shader, ItemStack item, String modelPart, int pass, boolean pre, boolean inventory)
-	{
-	}
+    @Override
+    public void stichTextures(IIconRegister ir, int sheetID) {}
+
+    @Override
+    public void modifyRender(ItemStack shader, ItemStack item, String modelPart, int pass, boolean pre,
+        boolean inventory) {}
 }

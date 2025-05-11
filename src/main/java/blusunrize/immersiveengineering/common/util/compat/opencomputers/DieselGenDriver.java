@@ -1,5 +1,8 @@
 package blusunrize.immersiveengineering.common.util.compat.opencomputers;
 
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+
 import blusunrize.immersiveengineering.common.blocks.metal.TileEntityDieselGenerator;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -7,88 +10,72 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.prefab.DriverTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 
-public class DieselGenDriver extends DriverTileEntity
-{
+public class DieselGenDriver extends DriverTileEntity {
 
-	@Override
-	public ManagedEnvironment createEnvironment(World w, int x, int y, int z)
-	{
-		TileEntity te = w.getTileEntity(x, y, z);
-		if (te instanceof TileEntityDieselGenerator)
-		{
-			TileEntityDieselGenerator master = ((TileEntityDieselGenerator)te).master();
-			int pos = ((TileEntityDieselGenerator)te).pos;
-			if (master!=null&&((pos==21&&!master.mirrored)||(pos==23&&master.mirrored)))
-				return new DieselEnvironment(w, master.xCoord, master.yCoord, master.zCoord);
-		}
-		return null;
-	}
+    @Override
+    public ManagedEnvironment createEnvironment(World w, int x, int y, int z) {
+        TileEntity te = w.getTileEntity(x, y, z);
+        if (te instanceof TileEntityDieselGenerator) {
+            TileEntityDieselGenerator master = ((TileEntityDieselGenerator) te).master();
+            int pos = ((TileEntityDieselGenerator) te).pos;
+            if (master != null && ((pos == 21 && !master.mirrored) || (pos == 23 && master.mirrored)))
+                return new DieselEnvironment(w, master.xCoord, master.yCoord, master.zCoord);
+        }
+        return null;
+    }
 
-	@Override
-	public Class<?> getTileEntityClass()
-	{
-		return TileEntityDieselGenerator.class;
-	}
+    @Override
+    public Class<?> getTileEntityClass() {
+        return TileEntityDieselGenerator.class;
+    }
 
+    public class DieselEnvironment extends ManagedEnvironmentIE<TileEntityDieselGenerator> {
 
-	public class DieselEnvironment extends ManagedEnvironmentIE<TileEntityDieselGenerator>
-	{
+        public DieselEnvironment(World w, int x, int y, int z) {
+            super(w, x, y, z, TileEntityDieselGenerator.class);
+        }
 
-		public DieselEnvironment(World w, int x, int y, int z)
-		{
-			super(w, x, y, z, TileEntityDieselGenerator.class);
-		}
+        @Callback(doc = "function(enable:boolean) -- allow or disallow the generator to run when it can")
+        public Object[] setEnabled(Context context, Arguments args) {
+            getTileEntity().computerActivated = args.checkBoolean(0);
+            return null;
+        }
 
-		@Callback(doc = "function(enable:boolean) -- allow or disallow the generator to run when it can")
-		public Object[] setEnabled(Context context, Arguments args)
-		{
-			getTileEntity().computerActivated = args.checkBoolean(0);
-			return null;
-		}
+        @Callback(doc = "function():boolean -- get whether the generator is currently producing energy")
+        public Object[] isActive(Context context, Arguments args) {
+            return new Object[] { getTileEntity().active };
+        }
 
-		@Callback(doc = "function():boolean -- get whether the generator is currently producing energy")
-		public Object[] isActive(Context context, Arguments args)
-		{
-			return new Object[]{getTileEntity().active};
-		}
+        @Callback(doc = "function():table -- get information about the internal fuel tank")
+        public Object[] getTankInfo(Context context, Arguments args) {
+            return new Object[] { getTileEntity().tank.getInfo() };
+        }
 
-		@Callback(doc = "function():table -- get information about the internal fuel tank")
-		public Object[] getTankInfo(Context context, Arguments args)
-		{
-			return new Object[]{getTileEntity().tank.getInfo()};
-		}
+        @Override
+        public String preferredName() {
+            return "ie_diesel_generator";
+        }
 
-		@Override
-		public String preferredName() {
-			return "ie_diesel_generator";
-		}
+        @Override
+        public int priority() {
+            return 1000;
+        }
 
-		@Override
-		public int priority() {
-			return 1000;
-		}
+        @Override
+        public void onConnect(Node node) {
+            TileEntityDieselGenerator te = getTileEntity();
+            if (te != null) {
+                te.computerControlled = true;
+                te.computerActivated = true;
+            }
+        }
 
-		@Override
-		public void onConnect(Node node)
-		{
-			TileEntityDieselGenerator te = getTileEntity();
-			if (te!=null)
-			{
-				te.computerControlled = true;
-				te.computerActivated = true;
-			}
-		}
+        @Override
+        public void onDisconnect(Node node) {
+            TileEntityDieselGenerator te = getTileEntity();
+            if (te != null) te.computerControlled = false;
+        }
 
-		@Override
-		public void onDisconnect(Node node)
-		{
-			TileEntityDieselGenerator te = getTileEntity();
-			if (te!=null)
-				te.computerControlled = false;
-		}
-
-	}
+    }
 }

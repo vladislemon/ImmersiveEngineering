@@ -1,11 +1,5 @@
 package blusunrize.immersiveengineering.common.gui;
 
-import blusunrize.immersiveengineering.api.energy.IImmersiveConnectable;
-import blusunrize.immersiveengineering.api.energy.IWireCoil;
-import blusunrize.immersiveengineering.api.tool.ITool;
-import blusunrize.immersiveengineering.common.IEContent;
-import blusunrize.immersiveengineering.common.gui.IESlot.ICallbackContainer;
-import blusunrize.immersiveengineering.common.items.ItemToolbox;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -17,173 +11,146 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.world.World;
 
-public class ContainerToolbox extends Container implements ICallbackContainer
-{
-	private World worldObj;
-	private int blockedSlot;
-	public IInventory input;
-	ItemStack toolbox = null;
-	EntityPlayer player = null;
-	public final int internalSlots;
+import blusunrize.immersiveengineering.api.energy.IImmersiveConnectable;
+import blusunrize.immersiveengineering.api.energy.IWireCoil;
+import blusunrize.immersiveengineering.api.tool.ITool;
+import blusunrize.immersiveengineering.common.IEContent;
+import blusunrize.immersiveengineering.common.gui.IESlot.ICallbackContainer;
+import blusunrize.immersiveengineering.common.items.ItemToolbox;
 
-	public ContainerToolbox(InventoryPlayer iinventory, World world)
-	{
-		this.worldObj = world;
-		this.player = iinventory.player;
-		this.toolbox = iinventory.getCurrentItem();
-		this.internalSlots = ((ItemToolbox)this.toolbox.getItem()).getInternalSlots(toolbox);
-		this.input = new InventoryStorageItem(this, toolbox);
-		this.blockedSlot = (iinventory.currentItem + 27 + internalSlots);
+public class ContainerToolbox extends Container implements ICallbackContainer {
 
-		int i=0;
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 48, 24));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 30, 42));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 48, 42));
+    private World worldObj;
+    private int blockedSlot;
+    public IInventory input;
+    ItemStack toolbox = null;
+    EntityPlayer player = null;
+    public final int internalSlots;
 
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 75, 24));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 93, 24));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++,111, 24));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 75, 42));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 93, 42));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++,111, 42));
-		this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++,129, 42));
+    public ContainerToolbox(InventoryPlayer iinventory, World world) {
+        this.worldObj = world;
+        this.player = iinventory.player;
+        this.toolbox = iinventory.getCurrentItem();
+        this.internalSlots = ((ItemToolbox) this.toolbox.getItem()).getInternalSlots(toolbox);
+        this.input = new InventoryStorageItem(this, toolbox);
+        this.blockedSlot = (iinventory.currentItem + 27 + internalSlots);
 
-		for(int j=0; j<6; j++)
-			this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 35+j*18, 77));
-		for(int j=0; j<7; j++)
-			this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 26+j*18, 112));
+        int i = 0;
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 48, 24));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 30, 42));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 48, 42));
 
-		bindPlayerInventory(iinventory);
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 75, 24));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 93, 24));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 111, 24));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 75, 42));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 93, 42));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 111, 42));
+        this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 129, 42));
 
-		if (!world.isRemote)
-			try {
-				((InventoryStorageItem)this.input).stackList = ((ItemToolbox)this.toolbox.getItem()).getContainedItems(this.toolbox);
-			}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		this.onCraftMatrixChanged(this.input);
-	}
+        for (int j = 0; j < 6; j++)
+            this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 35 + j * 18, 77));
+        for (int j = 0; j < 7; j++)
+            this.addSlotToContainer(new IESlot.ContainerCallback(this, this.input, i++, 26 + j * 18, 112));
 
-	@Override
-	public boolean canInsert(ItemStack stack, int slotNumer, Slot slotObject)
-	{
-		if(stack==null)
-			return true;
-		if(IEContent.itemToolbox.equals(stack.getItem()))
-			return false;
-		if(slotNumer<3)
-			return stack.getItem() instanceof ItemFood;
-		else if(slotNumer<10)
-		{
-			if (stack.getItem() instanceof ITool)
-				return ((ITool)stack.getItem()).isTool(stack);
-			if(stack.getItem() instanceof ItemTool)
-				return true;
-		}
-		else if(slotNumer<16)
-		{
-			if(stack.getItem() instanceof IWireCoil)
-				return true;
-			if(Block.getBlockFromItem(stack.getItem())!=null && Block.getBlockFromItem(stack.getItem()).hasTileEntity(stack.getItemDamage()))
-				return Block.getBlockFromItem(stack.getItem()).createTileEntity(worldObj, stack.getItemDamage()) instanceof IImmersiveConnectable;
-		}
-		else
-		{
-			return true;
-		}
-		return false;
-	}
-	@Override
-	public boolean canTake(ItemStack stack, int slotNumer, Slot slotObject)
-	{
-		return true;
-	}
+        bindPlayerInventory(iinventory);
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 9; j++)
-				this.addSlotToContainer(new Slot(inventoryPlayer, j+i*9+9, 8+j*18, 157+i*18));
+        if (!world.isRemote) try {
+            ((InventoryStorageItem) this.input).stackList = ((ItemToolbox) this.toolbox.getItem())
+                .getContainedItems(this.toolbox);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.onCraftMatrixChanged(this.input);
+    }
 
-		for (int i = 0; i < 9; i++)
-			this.addSlotToContainer(new Slot(inventoryPlayer, i, 8+i*18, 215));
-	}
+    @Override
+    public boolean canInsert(ItemStack stack, int slotNumer, Slot slotObject) {
+        if (stack == null) return true;
+        if (IEContent.itemToolbox.equals(stack.getItem())) return false;
+        if (slotNumer < 3) return stack.getItem() instanceof ItemFood;
+        else if (slotNumer < 10) {
+            if (stack.getItem() instanceof ITool) return ((ITool) stack.getItem()).isTool(stack);
+            if (stack.getItem() instanceof ItemTool) return true;
+        } else if (slotNumer < 16) {
+            if (stack.getItem() instanceof IWireCoil) return true;
+            if (Block.getBlockFromItem(stack.getItem()) != null && Block.getBlockFromItem(stack.getItem())
+                .hasTileEntity(stack.getItemDamage()))
+                return Block.getBlockFromItem(stack.getItem())
+                    .createTileEntity(worldObj, stack.getItemDamage()) instanceof IImmersiveConnectable;
+        } else {
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int slot)
-	{
-		ItemStack stack = null;
-		Slot slotObject = (Slot) inventorySlots.get(slot);
+    @Override
+    public boolean canTake(ItemStack stack, int slotNumer, Slot slotObject) {
+        return true;
+    }
 
-		if(slotObject != null && slotObject.getHasStack())
-		{
-			ItemStack stackInSlot = slotObject.getStack();
-			stack = stackInSlot.copy();
+    protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
+        for (int i = 0; i < 3; i++) for (int j = 0; j < 9; j++)
+            this.addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 157 + i * 18));
 
-			if(slot < internalSlots)
-			{
-				if(!this.mergeItemStack(stackInSlot, internalSlots, (internalSlots + 36), true))
-					return null;
-			}
-			else if(stackInSlot!=null)
-			{
-				boolean b = true;
-				for(int i=0; i<internalSlots; i++)
-				{
-					Slot s = (Slot)inventorySlots.get(i);
-					if(s!=null && s.isItemValid(stackInSlot))
-						if(this.mergeItemStack(stackInSlot, i, i+1, true))
-						{
-							b = false;
-							break;
-						}
-						else
-							continue;
-				}
-				if(b)
-					return null;
-			}
+        for (int i = 0; i < 9; i++) this.addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 215));
+    }
 
-			if (stackInSlot.stackSize == 0)
-				slotObject.putStack(null);
-			else
-				slotObject.onSlotChanged();
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int slot) {
+        ItemStack stack = null;
+        Slot slotObject = (Slot) inventorySlots.get(slot);
 
-			if (stackInSlot.stackSize == stack.stackSize)
-				return null;
-			slotObject.onPickupFromSlot(player, stack);
-		}
-		return stack;
-	}
+        if (slotObject != null && slotObject.getHasStack()) {
+            ItemStack stackInSlot = slotObject.getStack();
+            stack = stackInSlot.copy();
 
-	@Override
-	public boolean canInteractWith(EntityPlayer entityplayer)
-	{
-		return true;
-	}
+            if (slot < internalSlots) {
+                if (!this.mergeItemStack(stackInSlot, internalSlots, (internalSlots + 36), true)) return null;
+            } else if (stackInSlot != null) {
+                boolean b = true;
+                for (int i = 0; i < internalSlots; i++) {
+                    Slot s = (Slot) inventorySlots.get(i);
+                    if (s != null && s.isItemValid(stackInSlot)) if (this.mergeItemStack(stackInSlot, i, i + 1, true)) {
+                        b = false;
+                        break;
+                    } else continue;
+                }
+                if (b) return null;
+            }
 
-	@Override
-	public ItemStack slotClick(int par1, int par2, int par3, EntityPlayer par4EntityPlayer)
-	{
-		if(par1 == this.blockedSlot || (par3!=0&&par2==par4EntityPlayer.inventory.currentItem))
-			return null;		
-		((ItemToolbox)this.toolbox.getItem()).setContainedItems(this.toolbox, ((InventoryStorageItem)this.input).stackList);
+            if (stackInSlot.stackSize == 0) slotObject.putStack(null);
+            else slotObject.onSlotChanged();
 
-		return super.slotClick(par1, par2, par3, par4EntityPlayer);
-	}
+            if (stackInSlot.stackSize == stack.stackSize) return null;
+            slotObject.onPickupFromSlot(player, stack);
+        }
+        return stack;
+    }
 
-	@Override
-	public void onContainerClosed(EntityPlayer par1EntityPlayer)
-	{
-		super.onContainerClosed(par1EntityPlayer);
-		if (!this.worldObj.isRemote)
-		{
-			((ItemToolbox)this.toolbox.getItem()).setContainedItems(this.toolbox, ((InventoryStorageItem)this.input).stackList);
-			ItemStack hand = this.player.getCurrentEquippedItem();
-			if(hand!=null&&!this.toolbox.equals(hand))
-				this.player.setCurrentItemOrArmor(0, this.toolbox);
-			this.player.inventory.markDirty();
-		}
-	}
+    @Override
+    public boolean canInteractWith(EntityPlayer entityplayer) {
+        return true;
+    }
+
+    @Override
+    public ItemStack slotClick(int par1, int par2, int par3, EntityPlayer par4EntityPlayer) {
+        if (par1 == this.blockedSlot || (par3 != 0 && par2 == par4EntityPlayer.inventory.currentItem)) return null;
+        ((ItemToolbox) this.toolbox.getItem())
+            .setContainedItems(this.toolbox, ((InventoryStorageItem) this.input).stackList);
+
+        return super.slotClick(par1, par2, par3, par4EntityPlayer);
+    }
+
+    @Override
+    public void onContainerClosed(EntityPlayer par1EntityPlayer) {
+        super.onContainerClosed(par1EntityPlayer);
+        if (!this.worldObj.isRemote) {
+            ((ItemToolbox) this.toolbox.getItem())
+                .setContainedItems(this.toolbox, ((InventoryStorageItem) this.input).stackList);
+            ItemStack hand = this.player.getCurrentEquippedItem();
+            if (hand != null && !this.toolbox.equals(hand)) this.player.setCurrentItemOrArmor(0, this.toolbox);
+            this.player.inventory.markDirty();
+        }
+    }
 }

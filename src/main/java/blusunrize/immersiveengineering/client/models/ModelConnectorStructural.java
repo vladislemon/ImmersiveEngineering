@@ -8,8 +8,8 @@ import net.minecraft.entity.Entity;
  * Structural Connectionpoint - Damien A.W Hazard
  * Created using Tabula 5.0.0
  */
-public class ModelConnectorStructural extends ModelBase
-{
+public class ModelConnectorStructural extends ModelBase {
+
     public ModelRenderer side1;
     public ModelRenderer base;
     public ModelRenderer conncetionside1;
@@ -23,7 +23,7 @@ public class ModelConnectorStructural extends ModelBase
         this.base = new ModelRenderer(this, 6, 14);
         this.base.setRotationPoint(8.0F, 8.0F, 8.0F);
         this.base.addBox(-4.0F, 6.0F, -4.0F, 8, 2, 8, 0.0F);
-        
+
         this.side1 = new ModelRenderer(this, 0, 0);
         this.side1.setRotationPoint(0.0F, 0.0F, 0.0F);
         this.side1.addBox(2.0F, 0.0F, -4.0F, 2, 6, 8, 0.0F);
@@ -41,7 +41,7 @@ public class ModelConnectorStructural extends ModelBase
         this.conncetionside1 = new ModelRenderer(this, 0, 0);
         this.conncetionside1.setRotationPoint(0.0F, 0.0F, 0.0F);
         this.conncetionside1.addBox(4.0F, 1.5F, -1.0F, 1, 2, 2, 0.0F);
-        
+
         this.base.addChild(side1);
         this.base.addChild(side2);
         this.base.addChild(conncetionside1);
@@ -50,13 +50,13 @@ public class ModelConnectorStructural extends ModelBase
     }
 
     @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) { 
-//        this.Connection.render(f5);
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+        // this.Connection.render(f5);
         this.base.render(f5);
-//        this.side1.render(f5);
-//        this.Csonnectionside2.render(f5);
-//        this.conncetionside1.render(f5);
-//        this.side2.render(f5);
+        // this.side1.render(f5);
+        // this.Csonnectionside2.render(f5);
+        // this.conncetionside1.render(f5);
+        // this.side2.render(f5);
     }
 
     /**

@@ -25,110 +25,121 @@ import blusunrize.immersiveengineering.common.util.network.MessageTileSync;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
-public class GuiSorter extends GuiContainer
-{
-	TileEntityConveyorSorter tile;
-	public GuiSorter(InventoryPlayer inventoryPlayer, TileEntityConveyorSorter tile)
-	{
-		super(new ContainerSorter(inventoryPlayer, tile));
-		this.tile=tile;
-		this.ySize = 244;
-	}
+public class GuiSorter extends GuiContainer {
 
-	@Override
-	public void drawScreen(int mx, int my, float partial)
-	{
-		super.drawScreen(mx, my, partial);
-		for(GuiButton button : (List<GuiButton>)this.buttonList)
-		{
-			if(button instanceof ButtonSorter)
-				if(mx>button.xPosition&&mx<button.xPosition+18 && my>button.yPosition&&my<button.yPosition+18)
-				{
-					ArrayList<String> tooltip = new ArrayList<String>();
-					int type = ((ButtonSorter)button).type;
-					String[] split = StatCollector.translateToLocal(Lib.DESC_INFO+"filter."+(type==0?"oreDict":type==1?"nbt":"fuzzy")).split("<br>");
-					for(int i=0; i<split.length; i++)
-						tooltip.add((i==0?EnumChatFormatting.WHITE:EnumChatFormatting.GRAY)+split[i]);
-					ClientUtils.drawHoveringText(tooltip, mx, my, fontRendererObj, guiLeft+xSize,-1);
-					RenderHelper.enableGUIStandardItemLighting();
-				}
-		}
-	}
+    TileEntityConveyorSorter tile;
 
+    public GuiSorter(InventoryPlayer inventoryPlayer, TileEntityConveyorSorter tile) {
+        super(new ContainerSorter(inventoryPlayer, tile));
+        this.tile = tile;
+        this.ySize = 244;
+    }
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int mx, int my)
-	{
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		ClientUtils.bindTexture("immersiveengineering:textures/gui/sorter.png");
-		this.drawTexturedModalRect(guiLeft,guiTop, 0, 0, xSize, ySize);
-		for(int side=0; side<6; side++)
-		{
-			int x = guiLeft+ 30+ (side/2)*58;
-			int y = guiTop+ 44+ (side%2)*76;
-			String s = StatCollector.translateToLocal("desc.ImmersiveEngineering.info.blockSide."+ForgeDirection.getOrientation(side).toString()).substring(0, 1);
-			GL11.glEnable(3042);
-			ClientUtils.font().drawString(s, x-(ClientUtils.font().getStringWidth(s)/2), y, 0xaacccccc, true);
-		}
-		ClientUtils.bindTexture("immersiveengineering:textures/gui/sorter.png");
-	}
+    @Override
+    public void drawScreen(int mx, int my, float partial) {
+        super.drawScreen(mx, my, partial);
+        for (GuiButton button : (List<GuiButton>) this.buttonList) {
+            if (button instanceof ButtonSorter) if (mx > button.xPosition && mx < button.xPosition + 18
+                && my > button.yPosition
+                && my < button.yPosition + 18) {
+                    ArrayList<String> tooltip = new ArrayList<String>();
+                    int type = ((ButtonSorter) button).type;
+                    String[] split = StatCollector
+                        .translateToLocal(
+                            Lib.DESC_INFO + "filter." + (type == 0 ? "oreDict" : type == 1 ? "nbt" : "fuzzy"))
+                        .split("<br>");
+                    for (int i = 0; i < split.length; i++)
+                        tooltip.add((i == 0 ? EnumChatFormatting.WHITE : EnumChatFormatting.GRAY) + split[i]);
+                    ClientUtils.drawHoveringText(tooltip, mx, my, fontRendererObj, guiLeft + xSize, -1);
+                    RenderHelper.enableGUIStandardItemLighting();
+                }
+        }
+    }
 
-	@Override
-	public void initGui()
-	{
-		super.initGui();
-		this.buttonList.clear();
-		for(int side=0; side<6; side++)
-			for(int i=0; i<3; i++)
-			{
-				int x = guiLeft+3+ (side/2)*58 +i*18;
-				int y = guiTop+3+ (side%2)*76;
-				ButtonSorter b = new ButtonSorter(side*3+i, x,y, i);
-				b.active = i==0?this.tile.doOredict(side): i==1?this.tile.doNBT(side): this.tile.doFuzzy(side);
-				this.buttonList.add(b);
-			}
-	}
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float f, int mx, int my) {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        ClientUtils.bindTexture("immersiveengineering:textures/gui/sorter.png");
+        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+        for (int side = 0; side < 6; side++) {
+            int x = guiLeft + 30 + (side / 2) * 58;
+            int y = guiTop + 44 + (side % 2) * 76;
+            String s = StatCollector
+                .translateToLocal(
+                    "desc.ImmersiveEngineering.info.blockSide." + ForgeDirection.getOrientation(side)
+                        .toString())
+                .substring(0, 1);
+            GL11.glEnable(3042);
+            ClientUtils.font()
+                .drawString(
+                    s,
+                    x - (ClientUtils.font()
+                        .getStringWidth(s) / 2),
+                    y,
+                    0xaacccccc,
+                    true);
+        }
+        ClientUtils.bindTexture("immersiveengineering:textures/gui/sorter.png");
+    }
 
-	@Override
-	protected void actionPerformed(GuiButton button)
-	{
-		if(button instanceof ButtonSorter && FMLCommonHandler.instance().getEffectiveSide()==Side.CLIENT)
-		{
-			int side = button.id/3;
-			int bit = button.id%3;
-			int mask = (1<<bit);
-			this.tile.sideFilter[side] = this.tile.sideFilter[side]^mask;
+    @Override
+    public void initGui() {
+        super.initGui();
+        this.buttonList.clear();
+        for (int side = 0; side < 6; side++) for (int i = 0; i < 3; i++) {
+            int x = guiLeft + 3 + (side / 2) * 58 + i * 18;
+            int y = guiTop + 3 + (side % 2) * 76;
+            ButtonSorter b = new ButtonSorter(side * 3 + i, x, y, i);
+            b.active = i == 0 ? this.tile.doOredict(side) : i == 1 ? this.tile.doNBT(side) : this.tile.doFuzzy(side);
+            this.buttonList.add(b);
+        }
+    }
 
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setIntArray("sideConfig", this.tile.sideFilter);
-			ImmersiveEngineering.packetHandler.sendToServer(new MessageTileSync(tile, tag));
-			this.initGui();
-		}
-	}
+    @Override
+    protected void actionPerformed(GuiButton button) {
+        if (button instanceof ButtonSorter && FMLCommonHandler.instance()
+            .getEffectiveSide() == Side.CLIENT) {
+            int side = button.id / 3;
+            int bit = button.id % 3;
+            int mask = (1 << bit);
+            this.tile.sideFilter[side] = this.tile.sideFilter[side] ^ mask;
 
-	public static class ButtonSorter extends GuiButton
-	{
-		int type; 
-		boolean active = false;
-		public ButtonSorter(int id, int x, int y, int type)
-		{
-			super(id, x, y, 18,18, "");
-			this.type = type;
-		}
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setIntArray("sideConfig", this.tile.sideFilter);
+            ImmersiveEngineering.packetHandler.sendToServer(new MessageTileSync(tile, tag));
+            this.initGui();
+        }
+    }
 
-		@Override
-		public void drawButton(Minecraft mc, int mx, int my)
-		{
-			if (this.visible)
-			{
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				this.field_146123_n = mx >= this.xPosition && my >= this.yPosition && mx < this.xPosition + this.width && my < this.yPosition + this.height;
-				GL11.glEnable(GL11.GL_BLEND);
-				OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-				this.drawTexturedModalRect(this.xPosition, this.yPosition, 176+type*18,(active?3:21), this.width, this.height);
-				this.mouseDragged(mc, mx, my);
-			}
-		}
-	}
+    public static class ButtonSorter extends GuiButton {
+
+        int type;
+        boolean active = false;
+
+        public ButtonSorter(int id, int x, int y, int type) {
+            super(id, x, y, 18, 18, "");
+            this.type = type;
+        }
+
+        @Override
+        public void drawButton(Minecraft mc, int mx, int my) {
+            if (this.visible) {
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                this.field_146123_n = mx >= this.xPosition && my >= this.yPosition
+                    && mx < this.xPosition + this.width
+                    && my < this.yPosition + this.height;
+                GL11.glEnable(GL11.GL_BLEND);
+                OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                this.drawTexturedModalRect(
+                    this.xPosition,
+                    this.yPosition,
+                    176 + type * 18,
+                    (active ? 3 : 21),
+                    this.width,
+                    this.height);
+                this.mouseDragged(mc, mx, my);
+            }
+        }
+    }
 }

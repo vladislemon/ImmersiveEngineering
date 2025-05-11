@@ -9,32 +9,28 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.common.blocks.stone.TileEntityBlastFurnace;
 import blusunrize.immersiveengineering.common.gui.ContainerBlastFurnace;
 
-public class GuiBlastFurnace extends GuiContainer
-{
-	TileEntityBlastFurnace tile;
-	public GuiBlastFurnace(InventoryPlayer inventoryPlayer, TileEntityBlastFurnace tile)
-	{
-		super(new ContainerBlastFurnace(inventoryPlayer, tile));
-		this.tile=tile;
-	}
-	
+public class GuiBlastFurnace extends GuiContainer {
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float f, int mx, int my)
-	{
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		ClientUtils.bindTexture("immersiveengineering:textures/gui/blastFurnace.png");
-		this.drawTexturedModalRect(guiLeft,guiTop, 0, 0, xSize, ySize);
+    TileEntityBlastFurnace tile;
 
-		if(tile.lastBurnTime>0)
-		{
-			int h = (int)(12*(tile.burnTime/(float)tile.lastBurnTime));
-			this.drawTexturedModalRect(guiLeft+56,guiTop+37+12-h, 179, 1+12-h, 9, h);
-		}
-		if(tile.processMax>0)
-		{
-			int w = (int)(22*( (tile.processMax-tile.process)/(float)tile.processMax));
-			this.drawTexturedModalRect(guiLeft+76,guiTop+35, 177, 14, w, 16);
-		}
-	}
+    public GuiBlastFurnace(InventoryPlayer inventoryPlayer, TileEntityBlastFurnace tile) {
+        super(new ContainerBlastFurnace(inventoryPlayer, tile));
+        this.tile = tile;
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float f, int mx, int my) {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        ClientUtils.bindTexture("immersiveengineering:textures/gui/blastFurnace.png");
+        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+
+        if (tile.lastBurnTime > 0) {
+            int h = (int) (12 * (tile.burnTime / (float) tile.lastBurnTime));
+            this.drawTexturedModalRect(guiLeft + 56, guiTop + 37 + 12 - h, 179, 1 + 12 - h, 9, h);
+        }
+        if (tile.processMax > 0) {
+            int w = (int) (22 * ((tile.processMax - tile.process) / (float) tile.processMax));
+            this.drawTexturedModalRect(guiLeft + 76, guiTop + 35, 177, 14, w, 16);
+        }
+    }
 }

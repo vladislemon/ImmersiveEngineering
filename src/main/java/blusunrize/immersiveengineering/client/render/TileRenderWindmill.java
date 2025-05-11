@@ -9,27 +9,26 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.models.ModelWindmill;
 import blusunrize.immersiveengineering.common.blocks.wooden.TileEntityWindmill;
 
-public class TileRenderWindmill extends TileEntitySpecialRenderer
-{
-	static ModelWindmill model = new ModelWindmill();
+public class TileRenderWindmill extends TileEntitySpecialRenderer {
 
-	@Override
-	public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float f)
-	{
-		TileEntityWindmill mill = (TileEntityWindmill)tile;
+    static ModelWindmill model = new ModelWindmill();
 
-		GL11.glPushMatrix();
-		GL11.glTranslated(x+.5, y+.5, z+.5);
+    @Override
+    public void renderTileEntityAt(TileEntity tile, double x, double y, double z, float f) {
+        TileEntityWindmill mill = (TileEntityWindmill) tile;
 
-		GL11.glRotated(mill.facing==2?0: mill.facing==3?180: mill.facing==4?90: -90, 0, 1, 0);
+        GL11.glPushMatrix();
+        GL11.glTranslated(x + .5, y + .5, z + .5);
 
-		float rot = 360*(mill.rotation+(!mill.canTurn||mill.rotation==0?0:f*mill.prevRotation));
-		model.setRotateAngle(model.axel, 0, 0, -(float)Math.toRadians(rot));
+        GL11.glRotated(mill.facing == 2 ? 0 : mill.facing == 3 ? 180 : mill.facing == 4 ? 90 : -90, 0, 1, 0);
 
-		ClientUtils.bindTexture("immersiveengineering:textures/models/windmill.png");
-		model.render(null, 0, 0, 0, 0, 0, .0625f);
+        float rot = 360 * (mill.rotation + (!mill.canTurn || mill.rotation == 0 ? 0 : f * mill.prevRotation));
+        model.setRotateAngle(model.axel, 0, 0, -(float) Math.toRadians(rot));
 
-		GL11.glPopMatrix();
-	}
+        ClientUtils.bindTexture("immersiveengineering:textures/models/windmill.png");
+        model.render(null, 0, 0, 0, 0, 0, .0625f);
+
+        GL11.glPopMatrix();
+    }
 
 }

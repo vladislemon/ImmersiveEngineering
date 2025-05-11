@@ -8,16 +8,15 @@ import net.minecraft.entity.Entity;
  * Connector - Damien A.W Hazard
  * Created using Tabula 4.1.1
  */
-public class ModelConnectorLV extends ModelBase
-{
+public class ModelConnectorLV extends ModelBase {
+
     public ModelRenderer Bottom;
     public ModelRenderer Top;
     public ModelRenderer Insulator2;
     public ModelRenderer Insulator1;
     public ModelRenderer Insulator;
 
-    public ModelConnectorLV()
-    {
+    public ModelConnectorLV() {
         this.textureWidth = 64;
         this.textureHeight = 32;
         this.Insulator2 = new ModelRenderer(this, 32, 24);
@@ -35,7 +34,7 @@ public class ModelConnectorLV extends ModelBase
         this.Top = new ModelRenderer(this, 16, 18);
         this.Top.setRotationPoint(8.0F, 8.0F, 8.0F);
         this.Top.addBox(-1.5F, 0.0F, -1.5F, 3, 1, 3, 0.0F);
-        
+
         this.Top.addChild(this.Insulator2);
         this.Top.addChild(this.Insulator1);
         this.Top.addChild(this.Insulator);
@@ -43,7 +42,7 @@ public class ModelConnectorLV extends ModelBase
     }
 
     @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) { 
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
         this.Top.render(f5);
     }
 

@@ -1,5 +1,15 @@
 package blusunrize.immersiveengineering.common.util.compat.mapwriter;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.world.ChunkCoordIntPair;
+
 import blusunrize.immersiveengineering.api.DimensionChunkCoords;
 import blusunrize.immersiveengineering.api.tool.ExcavatorHandler;
 import blusunrize.immersiveengineering.common.util.Utils;
@@ -7,22 +17,15 @@ import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.map.MapView;
 import mapwriter.map.mapmode.MapMode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.world.ChunkCoordIntPair;
-
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class IEMineralsMwDataProvider implements IMwDataProvider {
+
     private final Map<ChunkCoordIntPair, ExcavatorHandler.MineralWorldInfo> cache = new HashMap<>();
     private int zoom;
 
     @Override
-    public ArrayList<IMwChunkOverlay> getChunksOverlay(int dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ) {
+    public ArrayList<IMwChunkOverlay> getChunksOverlay(int dim, double centerX, double centerZ, double minX,
+        double minZ, double maxX, double maxZ) {
         ArrayList<IMwChunkOverlay> overlays = new ArrayList<>(cache.size());
         for (Map.Entry<ChunkCoordIntPair, ExcavatorHandler.MineralWorldInfo> entry : cache.entrySet()) {
             overlays.add(new MineralOverlay(entry.getKey(), zoom, entry.getValue()));
@@ -36,8 +39,7 @@ public class IEMineralsMwDataProvider implements IMwDataProvider {
     }
 
     @Override
-    public void onMiddleClick(int dim, int bX, int bZ, MapView mapView) {
-    }
+    public void onMiddleClick(int dim, int bX, int bZ, MapView mapView) {}
 
     @Override
     public void onDimensionChanged(int dimension, MapView mapView) {
@@ -60,8 +62,7 @@ public class IEMineralsMwDataProvider implements IMwDataProvider {
     }
 
     @Override
-    public void onOverlayDeactivated(MapView mapView) {
-    }
+    public void onOverlayDeactivated(MapView mapView) {}
 
     @Override
     public void onDraw(MapView mapView, MapMode mapMode) {
@@ -73,7 +74,8 @@ public class IEMineralsMwDataProvider implements IMwDataProvider {
             if (mineral == null) {
                 continue;
             }
-            Point2D.Double pos = mapMode.blockXZtoScreenXY(mapView, coords.getCenterXPos(), coords.getCenterZPosition());
+            Point2D.Double pos = mapMode
+                .blockXZtoScreenXY(mapView, coords.getCenterXPos(), coords.getCenterZPosition());
             int zoom = mapView.getZoomLevel();
             if (zoom > 0) {
                 continue;
@@ -121,13 +123,13 @@ public class IEMineralsMwDataProvider implements IMwDataProvider {
     }
 
     private static int colorLerp(int c1, int c2, float k) {
-        return lerp((c1 >> 24) & 0xFF, (c2 >> 24) & 0xFF, k) << 24
-                | lerp((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, k) << 16
-                | lerp((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, k) << 8
-                | lerp((c1) & 0xFF, (c2) & 0xFF, k);
+        return lerp((c1 >> 24) & 0xFF, (c2 >> 24) & 0xFF, k) << 24 | lerp((c1 >> 16) & 0xFF, (c2 >> 16) & 0xFF, k) << 16
+            | lerp((c1 >> 8) & 0xFF, (c2 >> 8) & 0xFF, k) << 8
+            | lerp((c1) & 0xFF, (c2) & 0xFF, k);
     }
 
     private static class MineralOverlay implements IMwChunkOverlay {
+
         private static final int COLOR_NONE = 0x44FFFFFF;
         private static final int COLOR_FULL = 0x5500FF00;
         private static final int COLOR_EMPTY = 0x55FF0000;
@@ -137,7 +139,8 @@ public class IEMineralsMwDataProvider implements IMwDataProvider {
         private final int zoom;
         private final ExcavatorHandler.MineralWorldInfo mineralWorldInfo;
 
-        private MineralOverlay(ChunkCoordIntPair chunkPos, int zoom, ExcavatorHandler.MineralWorldInfo mineralWorldInfo) {
+        private MineralOverlay(ChunkCoordIntPair chunkPos, int zoom,
+            ExcavatorHandler.MineralWorldInfo mineralWorldInfo) {
             this.pos = new Point(chunkPos.chunkXPos, chunkPos.chunkZPos);
             this.zoom = zoom;
             this.mineralWorldInfo = mineralWorldInfo;
