@@ -87,7 +87,7 @@ public class NEISqueezerHandler extends TemplateRecipeHandler
 					this.arecipes.add(new CachedSqueezerRecipe(r));
 				else if(ff!=null && r.fluid!=null && r.fluid.getFluid()==ff)
 					this.arecipes.add(new CachedSqueezerRecipe(r));
-		
+
 		super.loadCraftingRecipes(outputId, results);
 	}
 	@Override
@@ -152,7 +152,7 @@ public class NEISqueezerHandler extends TemplateRecipeHandler
 				}
 			}
 		}
-		return super.keyTyped(gui, keyChar, keyCode, recipe); 		
+		return super.keyTyped(gui, keyChar, keyCode, recipe);
 	}
 	@Override
 	public boolean mouseClicked(GuiRecipe gui, int button, int recipe)
@@ -181,7 +181,7 @@ public class NEISqueezerHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleTooltip(GuiRecipe<?> gui, List<String> list, int recipe)
+	public List<String> handleTooltip(GuiRecipe gui, List<String> list, int recipe)
 	{
 		CachedSqueezerRecipe r = (CachedSqueezerRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)

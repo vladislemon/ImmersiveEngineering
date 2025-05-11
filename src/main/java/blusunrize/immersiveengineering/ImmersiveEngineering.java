@@ -58,9 +58,9 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(modid=ImmersiveEngineering.MODID,name=ImmersiveEngineering.MODNAME,version = ImmersiveEngineering.VERSION, dependencies="after:Railcraft;before:TConstruct;after:ThermalFoundation;after:Avaritia")
 public class ImmersiveEngineering
 {
-	public static final String MODID = "GRADLETOKEN_MODID";
-	public static final String MODNAME = "GRADLETOKEN_MODNAME";
-	public static final String VERSION = "GRADLETOKEN_VERSION";
+    public static final String MODID = "ImmersiveEngineering";
+    public static final String MODNAME = "Immersive Engineering";
+    public static final String VERSION = Tags.VERSION;
 
 	@Mod.Instance(MODID)
 	public static ImmersiveEngineering instance = new ImmersiveEngineering();
@@ -72,7 +72,7 @@ public class ImmersiveEngineering
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		//noinspection ConstantValue,MismatchedStringCase
+        // noinspection ConstantValue
 		IELogger.debug = VERSION.contains("dirty");
 		Config.init(event);
 		IEContent.preInit();

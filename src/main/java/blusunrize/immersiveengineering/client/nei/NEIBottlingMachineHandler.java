@@ -163,7 +163,7 @@ public class NEIBottlingMachineHandler extends TemplateRecipeHandler
 		}
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public boolean keyTyped(GuiRecipe gui, char keyChar, int keyCode, int recipe)
 	{
@@ -174,7 +174,7 @@ public class NEIBottlingMachineHandler extends TemplateRecipeHandler
 		CachedBottlingMachineRecipe r = (CachedBottlingMachineRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)
 		{
-			if(new Rectangle(15,5, 18,50).contains(relMouse)) 
+			if(new Rectangle(15,5, 18,50).contains(relMouse))
 				if(keyCode==NEIClientConfig.getKeyBinding("gui.recipe"))
 				{
 					if(GuiCraftingRecipe.openRecipeGui("liquid", new Object[] { r.fluid }))
@@ -186,7 +186,7 @@ public class NEIBottlingMachineHandler extends TemplateRecipeHandler
 						return true;
 				}
 		}
-		return super.keyTyped(gui, keyChar, keyCode, recipe); 		
+		return super.keyTyped(gui, keyChar, keyCode, recipe);
 	}
 	@Override
 	public boolean mouseClicked(GuiRecipe gui, int button, int recipe)
@@ -198,7 +198,7 @@ public class NEIBottlingMachineHandler extends TemplateRecipeHandler
 		CachedBottlingMachineRecipe r = (CachedBottlingMachineRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)
 		{
-			if(new Rectangle(15,5, 18,50).contains(relMouse)) 
+			if(new Rectangle(15,5, 18,50).contains(relMouse))
 				if(button==0)
 				{
 					if(GuiCraftingRecipe.openRecipeGui("liquid", new Object[] { r.fluid }))
@@ -214,7 +214,7 @@ public class NEIBottlingMachineHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe)
+	public List<String> handleItemTooltip(GuiRecipe gui, ItemStack stack, List<String> currenttip, int recipe)
 	{
 		Point mouse = getMousePosition();
 		Point offset = gui.getRecipePosition(recipe);
@@ -222,7 +222,7 @@ public class NEIBottlingMachineHandler extends TemplateRecipeHandler
 		CachedBottlingMachineRecipe r = (CachedBottlingMachineRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null && r.fluid!=null)
 		{
-			if(new Rectangle(15,5, 18,50).contains(relMouse)) 
+			if(new Rectangle(15,5, 18,50).contains(relMouse))
 			{
 				currenttip.add(r.fluid.getLocalizedName());
 				currenttip.add(EnumChatFormatting.GRAY.toString()+r.fluid.amount+" mB");

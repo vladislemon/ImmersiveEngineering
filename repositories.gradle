@@ -2,24 +2,8 @@
 
 repositories {
     maven {
-        name "GTNH Maven"
-        url "https://nexus.gtnewhorizons.com/repository/public/"
-    }
-    maven {
-        name "CurseMaven"
-        url "https://www.cursemaven.com/"
-    }
-    maven {
-        name "MM repo"
-        url "http://maven.k-4u.nl/"
-        metadataSources {
-            mavenPom()
-            artifact()
-        }
-    }
-    maven {
-        name "ModMaven"
-        url "https://modmaven.dev/"
+        name = "MM repo"
+        url = "http://maven.k-4u.nl/"
         metadataSources {
             mavenPom()
             artifact()

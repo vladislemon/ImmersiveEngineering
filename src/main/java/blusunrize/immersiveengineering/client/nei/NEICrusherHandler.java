@@ -163,7 +163,7 @@ public class NEICrusherHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleItemTooltip(GuiRecipe<?> gui, ItemStack stack, List<String> currenttip, int recipe)
+	public List<String> handleItemTooltip(GuiRecipe gui, ItemStack stack, List<String> currenttip, int recipe)
 	{
 		Point mouse = getMousePosition();
 		Point offset = gui.getRecipePosition(recipe);
@@ -173,7 +173,7 @@ public class NEICrusherHandler extends TemplateRecipeHandler
 		{
 			if(r.secondary!=null)
 				for(int i=0; i<r.secondary.length; i++)
-					if(new Rectangle(r.secondary[i].relx-1, r.secondary[i].rely-1, 18,18).contains(relMouse) && r.secondary[i].contains(stack)) 
+					if(new Rectangle(r.secondary[i].relx-1, r.secondary[i].rely-1, 18,18).contains(relMouse) && r.secondary[i].contains(stack))
 						currenttip.add(String.format("%s %.0f%%", StatCollector.translateToLocal(Lib.DESC_INFO+"chance"),r.secondaryChance[i]*100));
 		}
 		return currenttip;

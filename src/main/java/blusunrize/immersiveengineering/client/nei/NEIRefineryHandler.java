@@ -138,7 +138,7 @@ public class NEIRefineryHandler extends TemplateRecipeHandler
 						return true;
 				}
 		}
-		return super.keyTyped(gui, keyChar, keyCode, recipe); 		
+		return super.keyTyped(gui, keyChar, keyCode, recipe);
 	}
 	@Override
 	public boolean mouseClicked(GuiRecipe gui, int button, int recipe)
@@ -173,7 +173,7 @@ public class NEIRefineryHandler extends TemplateRecipeHandler
 	}
 
 	@Override
-	public List<String> handleTooltip(GuiRecipe<?> gui, List<String> list, int recipe)
+	public List<String> handleTooltip(GuiRecipe gui, List<String> list, int recipe)
 	{
 		CachedRefineryRecipe r = (CachedRefineryRecipe) this.arecipes.get(recipe%arecipes.size());
 		if(r!=null)
