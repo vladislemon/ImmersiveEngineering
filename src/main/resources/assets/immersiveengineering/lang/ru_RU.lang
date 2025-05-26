@@ -364,6 +364,9 @@ death.attack.ieRevolver_silver=%1$s был очищен серебряной п�
 death.attack.ieRevolver_potion=%1$s был облит зельем из пули-пузырька игрока %2$s
 death.attack.ieCrushed=%1$s был раздроблен
 
+
+immersiveengineering.button.orevein=Показать минеральные жилы
+
 #MANUAL
 #ie.manual.entry..name=
 #ie.manual.entry..subtext=

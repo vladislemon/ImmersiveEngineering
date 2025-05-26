@@ -46,9 +46,9 @@ public class ExcavatorHandler {
     /**
      * A HashMap of MineralMixes and their rarity (Integer out of 100)
      */
-    public static LinkedHashMap<MineralMix, Integer> mineralList = new LinkedHashMap<MineralMix, Integer>();
-    public static HashMap<DimensionChunkCoords, MineralWorldInfo> mineralCache = new HashMap<DimensionChunkCoords, MineralWorldInfo>();
-    private static HashMap<Integer, Integer> dimensionBasedTotalWeight = new HashMap<Integer, Integer>();
+    public static LinkedHashMap<MineralMix, Integer> mineralList = new LinkedHashMap<>();
+    public static HashMap<DimensionChunkCoords, MineralWorldInfo> mineralCache = new HashMap<>();
+    private static HashMap<Integer, Integer> dimensionBasedTotalWeight = new HashMap<>();
     public static int mineralVeinCapacity = 0;
 
     public static MineralMix addMineral(String name, int mineralWeight, float failChance, String[] ores,
@@ -152,6 +152,7 @@ public class ExcavatorHandler {
         public float[] chances;
         public ItemStack[] oreOutput;
         public float[] recalculatedChances;
+        public int primaryOreIndex = -1;
         boolean isValid = false;
         /**
          * Should an ore given to this mix not be present in the dictionary, it will attempt to draw a replacement from
@@ -169,15 +170,15 @@ public class ExcavatorHandler {
         }
 
         public MineralMix addReplacement(String original, String replacement) {
-            if (replacementOres == null) replacementOres = new HashMap();
+            if (replacementOres == null) replacementOres = new HashMap<>();
             replacementOres.put(original, replacement);
             return this;
         }
 
         public void recalculateChances() {
             double chanceSum = 0;
-            ArrayList<ItemStack> existing = new ArrayList();
-            ArrayList<Double> reChances = new ArrayList();
+            ArrayList<ItemStack> existing = new ArrayList<>();
+            ArrayList<Double> reChances = new ArrayList<>();
             for (int i = 0; i < ores.length; i++) {
                 String ore = ores[i];
                 if (replacementOres != null && !ApiUtils.isExistingOreName(ore) && replacementOres.containsKey(ore))
@@ -191,10 +192,32 @@ public class ExcavatorHandler {
                     }
                 }
             }
-            isValid = existing.size() > 0;
-            oreOutput = existing.toArray(new ItemStack[existing.size()]);
+            isValid = !existing.isEmpty();
+            oreOutput = existing.toArray(new ItemStack[0]);
             recalculatedChances = new float[reChances.size()];
-            for (int i = 0; i < reChances.size(); i++) recalculatedChances[i] = (float) (reChances.get(i) / chanceSum);
+            for (int i = 0; i < reChances.size(); i++) {
+                recalculatedChances[i] = (float) (reChances.get(i) / chanceSum);
+            }
+            calculatePrimaryOre();
+        }
+
+        private void calculatePrimaryOre() {
+            int maxIndex = -1;
+            float maxChance = Float.MIN_VALUE;
+            for (int i = 0; i < recalculatedChances.length; i++) {
+                if (recalculatedChances[i] > maxChance) {
+                    maxIndex = i;
+                    maxChance = recalculatedChances[i];
+                }
+            }
+            primaryOreIndex = maxIndex;
+        }
+
+        public ItemStack getPrimaryOre() {
+            if (primaryOreIndex == -1) {
+                return null;
+            }
+            return oreOutput[primaryOreIndex];
         }
 
         public ItemStack getRandomOre(Random rand) {
@@ -275,6 +298,7 @@ public class ExcavatorHandler {
             mix.isValid = isValid;
             mix.dimensionWhitelist = tag.getIntArray("dimensionWhitelist");
             mix.dimensionBlacklist = tag.getIntArray("dimensionBlacklist");
+            mix.calculatePrimaryOre();
             return mix;
         }
     }

@@ -53,6 +53,7 @@ public abstract class IECompatModule {
         moduleClasses.put("ComputerCraft", ComputercraftHelper.class);
         moduleClasses.put("OpenComputers", OCHelper.class);
         moduleClasses.put("MapWriter", MapWriterHelper.class);
+        moduleClasses.put("navigator", NavigatorHelper.class);
     }
 
     public static void doModulesPreInit() {

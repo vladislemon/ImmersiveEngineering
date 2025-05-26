@@ -462,7 +462,7 @@ chat.ImmersiveEngineering.info.coreDrill.infinite=Infinite
 
 chat.ImmersiveEngineering.info.pump.placeCobble.true=This pump will now replace fluids with cobblestone.
 chat.ImmersiveEngineering.info.pump.placeCobble.false=This pump will no longer replace fluid blocks with cobblestone. §6WARNING:§f This can cause lag and is not adviseable when dealing with large amounts of fluid!
-		
+
 chat.ImmersiveEngineering.info.energyTransfered=Average energy transferred over the last %1$s ticks: %2$s RF/t
 
 chat.ImmersiveEngineering.command.available=§6Available commands:§r %1$s
@@ -566,6 +566,9 @@ immersiveengineering.potion.flammable=Flammable
 immersiveengineering.potion.slippery=Slippery
 immersiveengineering.potion.conductive=Conductive
 immersiveengineering.potion.sticky=Sticky
+
+
+immersiveengineering.button.orevein=Show Mineral Veins
 
 #MANUAL
 #ie.manual.entry..name=

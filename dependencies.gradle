@@ -19,4 +19,8 @@ dependencies {
     implementation("curse.maven:minefactory-reloaded-66672:2366150")
     implementation("net.industrial-craft:industrialcraft-2:2.2.828-experimental:dev")
     implementation("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
+    implementation("com.github.GTNewHorizons:Navigator:1.0.16:dev")
+    runtimeOnlyNonPublishable(rfg.deobf("maven.modrinth:journeymap:5.2.9"))
+    runtimeOnlyNonPublishable(deobfCurse("xaeros-minimap-263420:6012805"))
+    runtimeOnlyNonPublishable(deobfCurse("xaeros-world-map-317780:5987124"))
 }
